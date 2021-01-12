@@ -1,25 +1,53 @@
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
+import { ProductGridItem } from "../components/ProductGridItem";
 import { useMe } from "../hooks/useMe";
+import { allProducts } from "../__generated__/allProducts";
 import { ConfirmVerificationCodeInput } from "../__generated__/globalTypes";
+
+const ALL_PRODUCTS_QUERY = gql`
+  query allProducts {
+    allProducts {
+      ok
+      error
+      products {
+        id
+        name
+        price
+        bigImg
+        savedAmount
+        category {
+          id
+          name
+          slug
+        }
+      }
+    }
+  }
+`;
 
 export const Home = () => {
   const history = useHistory();
-  const { data, loading } = useMe();
+  const { data: userData, loading: userLoading } = useMe();
   const {
     register,
     getValues,
     handleSubmit,
     errors,
   } = useForm<ConfirmVerificationCodeInput>({ mode: "onChange" });
+  const {
+    data: productsData,
+    loading: productsLoading,
+  } = useQuery<allProducts>(ALL_PRODUCTS_QUERY);
   const onClick = () => {
     const { code } = getValues();
     history.push(`/validate-code?code=${code}`);
   };
   return (
     <div>
-      {!loading && data?.me.user?.isVerified === false && (
+      {!userLoading && userData?.me.user?.isVerified === false && (
         <div className="h-screen flex justify-center items-center bg-indigo-500">
           <div className="max-w-screen-sm w-full mx-10 bg-white shadow-xl rounded-md py-12 px-10 sm:mx-0">
             <h1 className="text-center font-semibold text-2xl">
@@ -51,8 +79,21 @@ export const Home = () => {
           </div>
         </div>
       )}
-      {!loading && data?.me.user?.isVerified === true && (
-        <div className="max-w-screen-2xl">인증완료</div>
+      {!userLoading && userData?.me.user?.isVerified === true && (
+        <div className="bg-indigo-500 md:h-screen">
+          <div className="max-w-screen-2xl  mx-16 2xl:mx-auto py-24 grid md:grid-cols-4 gap-10">
+            {!productsLoading &&
+              productsData?.allProducts.products?.map((product) => (
+                <ProductGridItem
+                  key={product.id}
+                  name={product.name}
+                  price={product.price}
+                  bigImg={product.bigImg}
+                  savedAmount={product.savedAmount}
+                />
+              ))}
+          </div>
+        </div>
       )}
     </div>
   );
