@@ -58,11 +58,14 @@ export const LogIn = () => {
       <Helmet>
         <title>로그인 | front-end-practice</title>
       </Helmet>
-      <div className=" max-w-screen-sm   px-10 pt-20  pb-5  shadow-xl bg-white rounded-md  mx-10 sm:mx-auto  ">
+      <div className=" max-w-screen-sm   px-10 pt-10  pb-5  shadow-xl bg-white rounded-md  mx-10 sm:mx-auto  ">
         <form
           onSubmit={handleSubmit(onClick)}
           className="flex flex-col w-full "
         >
+          <h2 className="mb-5 text-center font-semibold text-2xl text-indigo-600">
+            로그인
+          </h2>
           <input
             className="py-5 px-3  w-full  mb-3 focus:outline-none border border-black"
             ref={register({
@@ -115,7 +118,7 @@ export const LogIn = () => {
           <h3>
             아직 회원이 아니신가요?{" "}
             <Link
-              className="text-indigo-700 hover:underline"
+              className="text-indigo-700 font-semibold hover:underline"
               to="/create-account"
             >
               여기
