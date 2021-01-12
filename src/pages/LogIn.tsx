@@ -1,10 +1,11 @@
 import React from "react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { logIn, logInVariables } from "../__generated__/logIn";
 import { Link } from "react-router-dom";
 import { isLoggedIn } from "../apollo";
 import { Helmet } from "react-helmet-async";
+import { LogInInput } from "../__generated__/globalTypes";
 
 const LOG_IN_MUTATION = gql`
   mutation logIn($input: LogInInput!) {
@@ -16,13 +17,8 @@ const LOG_IN_MUTATION = gql`
   }
 `;
 
-interface IFormProps {
-  email: string;
-  password: string;
-}
-
 export const LogIn = () => {
-  const { register, getValues, errors, handleSubmit } = useForm<IFormProps>({
+  const { register, getValues, errors, handleSubmit } = useForm<LogInInput>({
     mode: "onChange",
   });
   const onCompleted = (data: logIn) => {
@@ -34,6 +30,7 @@ export const LogIn = () => {
       console.log(token);
       localStorage.setItem("token", token);
       isLoggedIn(true);
+      window.location.reload();
     }
   };
   const onClick = () => {
@@ -58,7 +55,7 @@ export const LogIn = () => {
       <Helmet>
         <title>로그인 | front-end-practice</title>
       </Helmet>
-      <div className=" max-w-screen-sm   px-10 pt-10  pb-5  shadow-xl bg-white rounded-md  mx-10 sm:mx-auto  ">
+      <div className=" max-w-screen-sm  w-full  px-10 pt-10  pb-5  shadow-xl bg-white rounded-md  mx-10 ">
         <form
           onSubmit={handleSubmit(onClick)}
           className="flex flex-col w-full "
@@ -67,7 +64,7 @@ export const LogIn = () => {
             로그인
           </h2>
           <input
-            className="py-5 px-3  w-full  mb-3 focus:outline-none border border-black"
+            className="py-5 px-3  w-full  mb-3 focus:outline-none border border-black focus:border-indigo-600 transition-colors"
             ref={register({
               required: "이메일은 로그인 하는데 필수적인 요소입니다.",
               pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -88,7 +85,7 @@ export const LogIn = () => {
             </h4>
           )}
           <input
-            className="py-5 px-3  mb-3 w-full focus:outline-none border border-black"
+            className="py-5 px-3  mb-3 w-full focus:outline-none border border-black focus:border-indigo-600 transition-colors"
             ref={register({
               required: "비밀번호는 로그인 하는데 필수적인 요소입니다.",
             })}
@@ -115,7 +112,7 @@ export const LogIn = () => {
           )}
         </form>
         <div>
-          <h3>
+          <h3 className="text-center">
             아직 회원이 아니신가요?{" "}
             <Link
               className="text-indigo-700 font-semibold hover:underline"

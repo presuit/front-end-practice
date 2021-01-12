@@ -7,6 +7,16 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface ConfirmVerificationCodeInput {
+  code: string;
+}
+
+export interface CreateAccountInput {
+  email: string;
+  password: string;
+  username: string;
+}
+
 export interface LogInInput {
   email: string;
   password: string;
