@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Home } from "../pages/Home";
 import { ValidationCode } from "../pages/ValidateCode";
+import { Menu } from "./Menu";
 
 export const LoggedInRouter = () => {
   return (
@@ -20,6 +21,7 @@ export const LoggedInRouter = () => {
           <Home />
         </Route>
       </Switch>
+      <Menu />
     </Router>
   );
 };

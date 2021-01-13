@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { pickRandomBgColor } from "../utils";
 
 interface IProps {
   name: string;
@@ -20,19 +19,22 @@ export const ProductGridItem: React.FC<IProps> = ({
     if (hoverPlate.current && bgContainer.current) {
       console.log("event in!");
       hoverPlate.current.style.left = "0px";
+      hoverPlate.current.style.opacity = "1";
     }
   };
   const onMouseLeave = () => {
     if (hoverPlate.current && bgContainer.current) {
       console.log("event out!");
       hoverPlate.current.style.left = "-100%";
+      hoverPlate.current.style.opacity = "0";
     }
   };
   useEffect(() => {
     if (bgContainer.current && hoverPlate.current) {
-      bgContainer.current.onmouseover = onMouseEnter;
-      hoverPlate.current.onmouseover = onMouseEnter;
-      hoverPlate.current.onmouseout = onMouseLeave;
+      bgContainer.current.onmouseenter = onMouseEnter;
+      hoverPlate.current.onmouseenter = onMouseEnter;
+      hoverPlate.current.onmouseleave = onMouseLeave;
+      bgContainer.current.onmouseleave = onMouseLeave;
     }
   }, []);
   return (
@@ -44,7 +46,8 @@ export const ProductGridItem: React.FC<IProps> = ({
       ></div>
       <div
         ref={hoverPlate}
-        className="absolute top-0 -left-full  w-full h-full rounded-lg  cursor-pointer transition-all flex flex-col items-center justify-center bg-indigo-100 z-10"
+        className="absolute top-0 -left-full  w-full h-full rounded-lg  cursor-pointer transition-all flex flex-col items-center justify-center bg-indigo-100 z-10 opacity-0 "
+        style={{ transitionDuration: ".7s" }}
       >
         <h3 className="font-bold text-3xl text-gray-800">
           <span className="text-indigo-600">{savedAmount}만원</span>/{price}만원

@@ -1,0 +1,29 @@
+@keyframes makeMenuBig {
+  0% {
+    transform: scale(1);
+    width: 0%;
+  }
+  100% {
+    transform: scale(1.2);
+    width: 100%;
+  }
+}
+
+@keyframes makeMenuSmall {
+  0% {
+    transform: scale(1.2);
+    width: 100%;
+  }
+  100% {
+    transform: scale(1);
+    width: 0%;
+  }
+}
+
+#menuBig {
+  animation: makeMenuBig 1s ease-in-out forwards;
+}
+
+#menuSmall {
+  animation: makeMenuSmall 1s ease-in-out forwards;
+}

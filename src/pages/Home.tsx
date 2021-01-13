@@ -80,8 +80,8 @@ export const Home = () => {
         </div>
       )}
       {!userLoading && userData?.me.user?.isVerified === true && (
-        <div className="bg-indigo-500 md:h-screen">
-          <div className="max-w-screen-2xl  mx-16 2xl:mx-auto py-24 grid md:grid-cols-4 gap-10">
+        <div className=" ">
+          <div className="max-w-screen-2xl  mx-16 2xl:mx-auto pt-20 pb-32 grid md:grid-cols-4 gap-10">
             {!productsLoading &&
               productsData?.allProducts.products?.map((product) => (
                 <ProductGridItem
