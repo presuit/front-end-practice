@@ -15,6 +15,7 @@ import { ValidationCode } from "../pages/ValidateCode";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "../styles/animation.css";
+import { NotValidUser } from "../pages/NotValidUser";
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
@@ -26,16 +27,6 @@ export const LoggedInRouter = () => {
     window.location.href = "/";
     window.location.reload();
   };
-  if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <FontAwesomeIcon
-          className="text-5xl text-white spinAround "
-          icon={faSpinner}
-        />
-      </div>
-    );
-  }
   if (!loading && error) {
     return (
       <>
@@ -58,12 +49,26 @@ export const LoggedInRouter = () => {
       </>
     );
   }
-  console.log(error);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <FontAwesomeIcon
+          className="text-5xl text-white spinAround "
+          icon={faSpinner}
+        />
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Switch>
         <Route path="/" exact>
           <Home />
+        </Route>
+        <Route path="/not-valid-user">
+          <NotValidUser />
         </Route>
         <Route path="/validate-code">
           <ValidationCode />

@@ -1,3 +1,6 @@
+import { useHistory } from "react-router-dom";
+import { useMe } from "./hooks/useMe";
+
 const colors = [
   "blugGray",
   "coolGray",

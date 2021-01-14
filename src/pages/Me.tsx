@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Menu } from "../components/Menu";
-import { useMe } from "../hooks/useMe";
+import { useMe, useMyWallet } from "../hooks/useMe";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAt,
@@ -9,6 +9,7 @@ import {
   faUserCircle,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
+import { WalletHistory } from "../components/WalletHistory";
 
 enum UserProfileMenus {
   UsernameMenu = "userProfileUsernameMenu",
@@ -18,6 +19,7 @@ enum UserProfileMenus {
 
 export const Me = () => {
   const { data, loading } = useMe();
+  const { data: myWalletData, loading: myWalletLoading } = useMyWallet();
   const history = useHistory();
   const [selected, setSelected] = useState<string>(
     UserProfileMenus.UsernameMenu
@@ -62,8 +64,11 @@ export const Me = () => {
       selectedMenu.classList.add("bg-indigo-500", "text-amber-300");
     }
   }, [selected]);
-
-  console.log(data?.me.user);
+  useEffect(() => {
+    if (!loading && data?.me.user?.isVerified === false) {
+      history.push("/not-valid-user");
+    }
+  }, []);
 
   return (
     <div>
@@ -149,6 +154,49 @@ export const Me = () => {
                     </h2>
                   </div>
                 </div>
+              )}
+              {selected === UserProfileMenus.BuyingHistoryMenu && (
+                <>
+                  <div className="bg-white pt-10 pb-20 px-10">
+                    {!myWalletLoading &&
+                      myWalletData?.myWallet.wallet?.histories?.map(
+                        (walletHistory) => <WalletHistory {...walletHistory} />
+                      )}
+                  </div>
+                  <div className="flex overflow-hidden">
+                    {Array.from(
+                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    ).map(() => (
+                      <div
+                        className="w-0 h-0"
+                        style={{
+                          borderTop: "1rem solid white",
+                          borderLeft: "1rem solid transparent",
+                          borderRight: "1rem solid transparent",
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </>
+              )}
+              {selected === UserProfileMenus.SellingHistoryMenu && (
+                <>
+                  <div className="bg-white pt-10 pb-20 px-10"></div>
+                  <div className="flex overflow-hidden">
+                    {Array.from(
+                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    ).map(() => (
+                      <div
+                        className="w-0 h-0"
+                        style={{
+                          borderTop: "1rem solid white",
+                          borderLeft: "1rem solid transparent",
+                          borderRight: "1rem solid transparent",
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </>
               )}
             </main>
           </div>
