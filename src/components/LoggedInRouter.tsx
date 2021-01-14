@@ -58,6 +58,7 @@ export const LoggedInRouter = () => {
       </>
     );
   }
+  console.log(error);
   return (
     <Router>
       <Switch>

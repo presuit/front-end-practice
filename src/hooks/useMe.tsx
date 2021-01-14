@@ -11,6 +11,7 @@ const ME_QUERY = gql`
         isVerified
         email
         username
+        avatarImg
       }
     }
   }

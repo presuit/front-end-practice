@@ -13,6 +13,7 @@ export interface me_me_user {
   isVerified: boolean;
   email: string;
   username: string;
+  avatarImg: string | null;
 }
 
 export interface me_me {

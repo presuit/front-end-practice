@@ -1,5 +1,5 @@
 import React from "react";
 
 export const Messages = () => {
-  return <div>Messages</div>;
+  return <div>물좀 가져옴</div>;
 };
