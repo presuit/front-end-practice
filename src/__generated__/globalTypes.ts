@@ -7,6 +7,10 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface AllProductsInput {
+  page?: number | null;
+}
+
 export interface ConfirmVerificationCodeInput {
   code: string;
 }

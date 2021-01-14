@@ -1,35 +1,36 @@
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
-import React from "react";
+import { gql, useQuery } from "@apollo/client";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { ProductGridItem } from "../components/ProductGridItem";
 import { useMe } from "../hooks/useMe";
-import { allProducts } from "../__generated__/allProducts";
+import {
+  allProducts,
+  allProductsVariables,
+} from "../__generated__/allProducts";
 import { ConfirmVerificationCodeInput } from "../__generated__/globalTypes";
+import { PRODUCTS_FRAGMENT } from "../fragment";
+import { Menu } from "../components/Menu";
 
 const ALL_PRODUCTS_QUERY = gql`
-  query allProducts {
-    allProducts {
+  query allProducts($input: AllProductsInput!) {
+    allProducts(input: $input) {
       ok
       error
+      totalResults
+      totalPages
       products {
-        id
-        name
-        price
-        bigImg
-        savedAmount
-        category {
-          id
-          name
-          slug
-        }
+        ...productsParts
       }
     }
   }
+
+  ${PRODUCTS_FRAGMENT}
 `;
 
 export const Home = () => {
   const history = useHistory();
+  const [page, setPage] = useState(1);
   const { data: userData, loading: userLoading } = useMe();
   const {
     register,
@@ -37,14 +38,24 @@ export const Home = () => {
     handleSubmit,
     errors,
   } = useForm<ConfirmVerificationCodeInput>({ mode: "onChange" });
-  const {
-    data: productsData,
-    loading: productsLoading,
-  } = useQuery<allProducts>(ALL_PRODUCTS_QUERY);
-  const onClick = () => {
+  const { data: productsData, loading: productsLoading } = useQuery<
+    allProducts,
+    allProductsVariables
+  >(ALL_PRODUCTS_QUERY, {
+    variables: {
+      input: {
+        page,
+      },
+    },
+  });
+  const onClickValidation = () => {
     const { code } = getValues();
     history.push(`/validate-code?code=${code}`);
   };
+  console.log(
+    productsData?.allProducts.totalPages,
+    productsData?.allProducts.totalResults
+  );
   return (
     <div>
       {!userLoading && userData?.me.user?.isVerified === false && (
@@ -54,7 +65,7 @@ export const Home = () => {
               받으신 코드를 입력하고, 서비스를 계속 이용해주세요.
             </h1>
             <form
-              onSubmit={handleSubmit(onClick)}
+              onSubmit={handleSubmit(onClickValidation)}
               className="w-full mt-5 flex flex-col items-end"
             >
               <input
@@ -80,8 +91,8 @@ export const Home = () => {
         </div>
       )}
       {!userLoading && userData?.me.user?.isVerified === true && (
-        <div className=" ">
-          <div className="max-w-screen-2xl  mx-16 2xl:mx-auto pt-20 pb-32 grid md:grid-cols-4 gap-10">
+        <div>
+          <div className="max-w-screen-2xl md:h-screen  mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-10">
             {!productsLoading &&
               productsData?.allProducts.products?.map((product) => (
                 <ProductGridItem
@@ -93,6 +104,12 @@ export const Home = () => {
                 />
               ))}
           </div>
+          <Menu
+            totalPages={productsData?.allProducts.totalPages}
+            totalProducts={productsData?.allProducts.totalResults}
+            page={page}
+            setPage={setPage}
+          />
         </div>
       )}
     </div>

@@ -1,22 +1,33 @@
 @keyframes makeMenuBig {
   0% {
-    transform: scale(1);
-    width: 0%;
+    width: 0px;
   }
   100% {
-    transform: scale(1.2);
     width: 100%;
   }
 }
 
 @keyframes makeMenuSmall {
   0% {
-    transform: scale(1.2);
     width: 100%;
   }
   100% {
-    transform: scale(1);
-    width: 0%;
+    width: 0px;
+  }
+}
+
+@keyframes slowToShow {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes spinAround {
+  100% {
+    transform: rotate(360deg);
   }
 }
 
@@ -26,4 +37,12 @@
 
 #menuSmall {
   animation: makeMenuSmall 1s ease-in-out forwards;
+}
+
+.slowToShow {
+  animation: slowToShow 0.6s ease-in-out forwards;
+}
+
+.spinAround {
+  animation: spinAround 1s infinite;
 }

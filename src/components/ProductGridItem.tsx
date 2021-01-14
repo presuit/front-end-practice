@@ -17,14 +17,12 @@ export const ProductGridItem: React.FC<IProps> = ({
   const hoverPlate = useRef<HTMLDivElement>(null);
   const onMouseEnter = () => {
     if (hoverPlate.current && bgContainer.current) {
-      console.log("event in!");
       hoverPlate.current.style.left = "0px";
       hoverPlate.current.style.opacity = "1";
     }
   };
   const onMouseLeave = () => {
     if (hoverPlate.current && bgContainer.current) {
-      console.log("event out!");
       hoverPlate.current.style.left = "-100%";
       hoverPlate.current.style.opacity = "0";
     }
@@ -38,10 +36,10 @@ export const ProductGridItem: React.FC<IProps> = ({
     }
   }, []);
   return (
-    <div className="relative overflow-hidden ">
+    <div className="relative overflow-hidden">
       <div
         ref={bgContainer}
-        className=" py-24 bg-center bg-cover shadow-lg rounded-lg"
+        className=" py-24 md:w-full md:h-full md:py-0 bg-center bg-cover shadow-lg rounded-lg  "
         style={{ backgroundImage: `url(${bigImg})` }}
       ></div>
       <div
