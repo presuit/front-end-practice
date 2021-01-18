@@ -9,6 +9,7 @@ import {
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { getNameSuppressed } from "../utils";
 
 interface IParams {
   id: string;
@@ -42,30 +43,57 @@ export const Product = () => {
   }
   console.log(data);
   return (
-    <div>
-      <div className=" min-h-screen max-w-screen-2xl shadow-2xl mx-12 2xl:mx-auto">
-        <div className="grid grid-cols-2 items-center pt-10">
-          <div
-            className="p-32 md:p-52 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
-            }}
-          ></div>
-          <div className="border-2 border-amber-300">
-            <h1 className="mx-5 my-3 text-3xl font-semibold p-5  text-amber-400">
-              {data?.findProductById.product?.name}
-            </h1>
-            <h1 className="mx-5 my-3 text-3xl font-semibold p-5  text-amber-400">
-              {data?.findProductById.product?.price}
-            </h1>
-            <h1 className="mx-5 my-3 text-3xl font-semibold p-5  text-amber-400">
-              {data?.findProductById.product?.savedAmount}
-            </h1>
-            <h1 className="mx-5 my-3 text-3xl font-semibold p-5  text-amber-400">
-              {data?.findProductById.product?.category.slug}
-            </h1>
-          </div>
+    <div className="relative">
+      <Link to="/">
+        <FontAwesomeIcon
+          icon={faArrowLeft}
+          className="absolute text-2xl text-gray-700 mx-3 my-5 hover:text-amber-400 transition-colors md:text-5xl"
+        />
+      </Link>
+      <div className="min-h-screen  shadow-2xl ">
+        <div
+          className="py-32 2xl:py-52 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
+          }}
+        ></div>
+        <div className="flex justify-between items-center px-5 py-10  bg-amber-300 ">
+          {data?.findProductById.product && (
+            <>
+              <div>
+                <h1 className="text-lg md:text-3xl pb-5  text-indigo-600 font-semibold">
+                  📦: {getNameSuppressed(data?.findProductById.product?.name)}
+                </h1>
+                <h2 className="text-lg md:text-3xl pb-5 text-indigo-600 font-semibold">
+                  💲: {data?.findProductById.product?.savedAmount}/
+                  {data?.findProductById.product?.price}원
+                </h2>
+
+                <h2 className="text-lg md:text-3xl text-indigo-600 font-semibold hover:underline">
+                  <Link
+                    to={`/category/${data?.findProductById.product?.category.slug}`}
+                  >
+                    🛒: {data?.findProductById.product?.category.slug}
+                  </Link>
+                </h2>
+              </div>
+              <div className="flex items-center">
+                <div className="mr-5 text-lg md:text-3xl text-coolGray-600 border-4  px-3 py-5 rounded-full border-indigo-600 focus:outline-none">
+                  <h1 className="text-center">👩👨🧑👧</h1>
+                  <h1 className="text-center text-black">15,438</h1>
+                </div>
+                <button className="text-lg md:text-3xl font-semibold text-coolGray-600 border-4  px-3 py-5 rounded-full border-indigo-600 focus:outline-none hover:bg-indigo-600 hover:text-amber-400  transition-all">
+                  참여하기
+                </button>
+              </div>
+            </>
+          )}
         </div>
+        {data?.findProductById.product?.description && (
+          <div className="bg-indigo-600 py-20">
+            {data.findProductById.product.description}
+          </div>
+        )}
       </div>
     </div>
   );
