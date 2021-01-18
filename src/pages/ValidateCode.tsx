@@ -56,7 +56,7 @@ export const ValidationCode = () => {
   }, []);
   return (
     <div>
-      <div className="h-screen flex flex-col justify-center items-center bg-indigo-500">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-indigo-500">
         {loading && (
           <h1 className="text-white font-semibold text-2xl">Loading...</h1>
         )}

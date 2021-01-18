@@ -60,7 +60,7 @@ export const CreateAccount = () => {
   console.log(data);
 
   return (
-    <div className=" h-screen  bg-indigo-500 flex items-center justify-center">
+    <div className=" min-h-screen  bg-indigo-500 flex items-center justify-center">
       <Helmet>
         <title>회원가입 | front-end-practice</title>
       </Helmet>

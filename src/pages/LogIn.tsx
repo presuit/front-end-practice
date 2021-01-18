@@ -51,7 +51,7 @@ export const LogIn = () => {
     onCompleted,
   });
   return (
-    <div className=" h-screen  bg-indigo-500 flex items-center justify-center">
+    <div className=" min-h-screen   flex items-center justify-center">
       <Helmet>
         <title>로그인 | front-end-practice</title>
       </Helmet>

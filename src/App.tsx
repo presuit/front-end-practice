@@ -6,7 +6,6 @@ import { LoggedOutRouter } from "./components/LoggedOutRouter";
 
 function App() {
   const isLoggedInVar = useReactiveVar<boolean>(isLoggedIn);
-  console.log(isLoggedInVar, "gg");
   return isLoggedInVar ? <LoggedInRouter /> : <LoggedOutRouter />;
 }
 

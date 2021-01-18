@@ -74,7 +74,7 @@ export const Me = () => {
     <div>
       {!loading && data?.me.user && (
         <>
-          <div className="max-w-screen-2xl h-screen  mx-12 2xl:mx-auto shadow-2xl">
+          <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
             <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
               <div
                 id="userProfileUsernameMenu"
@@ -123,14 +123,16 @@ export const Me = () => {
                   ></div>
                   <div className=" md:w-2/3 grid grid-cols-3  w-full">
                     <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
-                      <span className="z-10">{data.me.user.email}</span>
+                      <span className="z-10 text-black">
+                        {data.me.user.email}
+                      </span>
                       <FontAwesomeIcon
                         icon={faAt}
                         className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                       />
                     </h2>
                     <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
-                      <span className="z-10">
+                      <span className="z-10 text-black">
                         {data.me.user.isVerified ? "인증 됨" : "인증되지 않음"}
                       </span>
                       {data.me.user.isVerified ? (
@@ -146,7 +148,9 @@ export const Me = () => {
                       )}
                     </h2>
                     <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
-                      <span className="z-10">{data.me.user.username}</span>
+                      <span className="z-10 text-black">
+                        {data.me.user.username}
+                      </span>
                       <FontAwesomeIcon
                         icon={faUserCircle}
                         className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
@@ -157,25 +161,13 @@ export const Me = () => {
               )}
               {selected === UserProfileMenus.BuyingHistoryMenu && (
                 <>
-                  <div className="bg-white pt-10 pb-20 px-10">
+                  <div className="pt-10 pb-32 md:px-10 grid  md:grid-cols-3 gap-5  overflow-hidden">
                     {!myWalletLoading &&
                       myWalletData?.myWallet.wallet?.histories?.map(
-                        (walletHistory) => <WalletHistory {...walletHistory} />
+                        (walletHistory, index) => (
+                          <WalletHistory key={index} {...walletHistory} />
+                        )
                       )}
-                  </div>
-                  <div className="flex overflow-hidden">
-                    {Array.from(
-                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                    ).map(() => (
-                      <div
-                        className="w-0 h-0"
-                        style={{
-                          borderTop: "1rem solid white",
-                          borderLeft: "1rem solid transparent",
-                          borderRight: "1rem solid transparent",
-                        }}
-                      ></div>
-                    ))}
                   </div>
                 </>
               )}
@@ -183,10 +175,9 @@ export const Me = () => {
                 <>
                   <div className="bg-white pt-10 pb-20 px-10"></div>
                   <div className="flex overflow-hidden">
-                    {Array.from(
-                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                    ).map(() => (
+                    {Array.from({ length: 50 }, () => "a").map((_, index) => (
                       <div
+                        key={index}
                         className="w-0 h-0"
                         style={{
                           borderTop: "1rem solid white",

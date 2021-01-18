@@ -21,5 +21,6 @@ export interface productsParts {
   price: number;
   bigImg: string | null;
   savedAmount: number;
+  description: string | null;
   category: productsParts_category;
 }

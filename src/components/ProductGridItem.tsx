@@ -36,7 +36,7 @@ export const ProductGridItem: React.FC<IProps> = ({
     }
   }, []);
   return (
-    <div className="relative overflow-hidden">
+    <div className="w-full h-full relative overflow-hidden">
       <div
         ref={bgContainer}
         className=" py-24 md:w-full md:h-full md:py-0 bg-center bg-cover shadow-lg rounded-lg  "

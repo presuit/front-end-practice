@@ -23,6 +23,7 @@ export interface allProducts_allProducts_products {
   price: number;
   bigImg: string | null;
   savedAmount: number;
+  description: string | null;
   category: allProducts_allProducts_products_category;
 }
 

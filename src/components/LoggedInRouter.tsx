@@ -16,6 +16,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "../styles/animation.css";
 import { NotValidUser } from "../pages/NotValidUser";
+import { Product } from "../pages/Product";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
@@ -51,37 +53,52 @@ export const LoggedInRouter = () => {
   }
 
   if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <FontAwesomeIcon
-          className="text-5xl text-white spinAround "
-          icon={faSpinner}
-        />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
+
+  const routes = [
+    {
+      path: "/",
+      component: Home,
+      exact: true,
+    },
+    {
+      path: "/not-valid-user",
+      component: NotValidUser,
+    },
+    {
+      path: "/validate-code",
+      component: ValidationCode,
+    },
+    {
+      path: "/me",
+      component: Me,
+    },
+    {
+      path: "/users/:id",
+      component: UserProfile,
+    },
+    {
+      path: "/messages",
+      component: Messages,
+    },
+    {
+      path: "/product/:id",
+      component: Product,
+    },
+  ];
 
   return (
     <Router>
       <Switch>
-        <Route path="/" exact>
-          <Home />
-        </Route>
-        <Route path="/not-valid-user">
-          <NotValidUser />
-        </Route>
-        <Route path="/validate-code">
-          <ValidationCode />
-        </Route>
-        <Route path="/me">
-          <Me />
-        </Route>
-        <Route path="/users/:id">
-          <UserProfile />
-        </Route>
-        <Route path="/messages">
-          <Messages />
-        </Route>
+        {routes.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            component={route.component}
+            exact={route.exact}
+          />
+        ))}
         <Route>
           <Redirect to={"/"} />
         </Route>

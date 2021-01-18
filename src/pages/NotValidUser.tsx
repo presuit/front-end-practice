@@ -17,7 +17,7 @@ export const NotValidUser = () => {
   };
   return (
     <div>
-      <div className="h-screen flex justify-center items-center bg-indigo-500">
+      <div className="min-h-screen flex justify-center items-center bg-indigo-500">
         <div className="max-w-screen-sm w-full mx-10 bg-white shadow-xl rounded-md py-12 px-10 sm:mx-0">
           <h1 className="text-center font-semibold text-2xl">
             받으신 코드를 입력하고, 서비스를 계속 이용해주세요.

@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { ProductGridItem } from "../components/ProductGridItem";
 import { useMe } from "../hooks/useMe";
 import {
@@ -30,7 +30,7 @@ export const Home = () => {
   const history = useHistory();
   const [page, setPage] = useState(1);
   const { data: userData, loading: userLoading } = useMe();
-  const { data: productsData, loading: productsLoading } = useQuery<
+  const { data: productsData, loading: productsLoading, refetch } = useQuery<
     allProducts,
     allProductsVariables
   >(ALL_PRODUCTS_QUERY, {
@@ -44,21 +44,23 @@ export const Home = () => {
     if (!userLoading && userData?.me.user?.isVerified === false) {
       history.push("/not-valid-user");
     }
+    refetch({ input: { page } });
   }, []);
   return (
     <div>
       {!userLoading && userData?.me.user?.isVerified === true && (
         <div>
-          <div className="max-w-screen-2xl md:h-screen  mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-10">
+          <div className="max-w-screen-2xl min-h-screen mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-10">
             {!productsLoading &&
               productsData?.allProducts.products?.map((product) => (
-                <ProductGridItem
-                  key={product.id}
-                  name={product.name}
-                  price={product.price}
-                  bigImg={product.bigImg}
-                  savedAmount={product.savedAmount}
-                />
+                <Link key={product.id} to={`/product/${product.id}`}>
+                  <ProductGridItem
+                    name={product.name}
+                    price={product.price}
+                    bigImg={product.bigImg}
+                    savedAmount={product.savedAmount}
+                  />
+                </Link>
               ))}
           </div>
           <Menu

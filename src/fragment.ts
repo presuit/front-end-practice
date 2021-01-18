@@ -7,6 +7,7 @@ export const PRODUCTS_FRAGMENT = gql`
     price
     bigImg
     savedAmount
+    description
     category {
       id
       name

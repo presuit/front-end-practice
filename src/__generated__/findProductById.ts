@@ -7,9 +7,22 @@
 // GraphQL query operation: findProductById
 // ====================================================
 
+export interface findProductById_findProductById_product_category {
+  __typename: "Category";
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface findProductById_findProductById_product {
   __typename: "Product";
+  id: number;
   name: string;
+  price: number;
+  bigImg: string | null;
+  savedAmount: number;
+  description: string | null;
+  category: findProductById_findProductById_product_category;
 }
 
 export interface findProductById_findProductById {
