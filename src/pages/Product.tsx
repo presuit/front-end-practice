@@ -43,57 +43,27 @@ export const Product = () => {
   }
   console.log(data);
   return (
-    <div className="relative">
-      <Link to="/">
-        <FontAwesomeIcon
-          icon={faArrowLeft}
-          className="absolute text-2xl text-gray-700 mx-3 my-5 hover:text-amber-400 transition-colors md:text-5xl"
-        />
-      </Link>
-      <div className="min-h-screen  shadow-2xl ">
-        <div
-          className="py-32 2xl:py-52 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
-          }}
-        ></div>
-        <div className="flex justify-between items-center px-5 py-10  bg-amber-300 ">
-          {data?.findProductById.product && (
-            <>
-              <div>
-                <h1 className="text-lg md:text-3xl pb-5  text-indigo-600 font-semibold">
-                  📦: {getNameSuppressed(data?.findProductById.product?.name)}
-                </h1>
-                <h2 className="text-lg md:text-3xl pb-5 text-indigo-600 font-semibold">
-                  💲: {data?.findProductById.product?.savedAmount}/
-                  {data?.findProductById.product?.price}원
-                </h2>
-
-                <h2 className="text-lg md:text-3xl text-indigo-600 font-semibold hover:underline">
-                  <Link
-                    to={`/category/${data?.findProductById.product?.category.slug}`}
-                  >
-                    🛒: {data?.findProductById.product?.category.slug}
-                  </Link>
-                </h2>
-              </div>
-              <div className="flex items-center">
-                <div className="mr-5 text-lg md:text-3xl text-coolGray-600 border-4  px-3 py-5 rounded-full border-indigo-600 focus:outline-none">
-                  <h1 className="text-center">👩👨🧑👧</h1>
-                  <h1 className="text-center text-black">15,438</h1>
-                </div>
-                <button className="text-lg md:text-3xl font-semibold text-coolGray-600 border-4  px-3 py-5 rounded-full border-indigo-600 focus:outline-none hover:bg-indigo-600 hover:text-amber-400  transition-all">
-                  참여하기
-                </button>
-              </div>
-            </>
-          )}
+    <div>
+      <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl">
+        <div className="py-16 md:py-32 bg-amber-400 relative opacity-90 z-0">
+          <div className="py-16 w-full bg-amber-400 absolute left-0 bottom-0 transform translate-y-16 skew-y-3 z-0"></div>
         </div>
-        {data?.findProductById.product?.description && (
-          <div className="bg-indigo-600 py-20">
-            {data.findProductById.product.description}
+        <div className="flex items-center flex-col md:flex-row h-64 md:h-80  px-10  z-10  transform -translate-y-16 md:-translate-y-24 shadow-2xl">
+          <div
+            className="bg-cover bg-center h-full z-10  md:w-1/2 w-full "
+            style={{
+              backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
+            }}
+          ></div>
+          <div className="z-10 bg-amber-100   h-full w-full md:w-1/3">
+            <h1 className="text-xl md:text-3xl">
+              📦 {data?.findProductById.product?.name}
+            </h1>
+            <h1 className="text-xl md:text-3xl">
+              💲 {data?.findProductById.product?.price}
+            </h1>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
