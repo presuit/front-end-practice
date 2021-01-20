@@ -86,6 +86,10 @@ export const LoggedInRouter = () => {
       path: "/product/:id",
       component: Product,
     },
+    {
+      path: "/category/:slug",
+      component: Home,
+    },
   ];
 
   return (
