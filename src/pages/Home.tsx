@@ -50,7 +50,7 @@ export const Home = () => {
     <div>
       {!userLoading && userData?.me.user?.isVerified === true && (
         <div>
-          <div className="max-w-screen-2xl min-h-screen mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-10">
+          <div className="max-w-screen-2xl min-h-screen mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-5">
             {!productsLoading &&
               productsData?.allProducts.products?.map((product) => (
                 <Link key={product.id} to={`/product/${product.id}`}>

@@ -114,50 +114,65 @@ export const Me = () => {
             </header>
             <main className="p-5">
               {selected === UserProfileMenus.UsernameMenu && (
-                <div className="md:flex shadow hover:shadow-xl transition-shadow duration-500 border bg-amber-400 border-indigo-600">
-                  <div
-                    className="py-32 w-full md:w-1/3 md:py-40 bg-cover bg-center "
-                    style={{
-                      backgroundImage: `url(${data.me.user.avatarImg})`,
-                    }}
-                  ></div>
-                  <div className=" md:w-2/3 grid grid-cols-3  w-full">
-                    <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
-                      <span className="z-10 text-black">
-                        {data.me.user.email}
-                      </span>
-                      <FontAwesomeIcon
-                        icon={faAt}
-                        className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
-                      />
-                    </h2>
-                    <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
-                      <span className="z-10 text-black">
-                        {data.me.user.isVerified ? "인증 됨" : "인증되지 않음"}
-                      </span>
-                      {data.me.user.isVerified ? (
+                <>
+                  <div className="md:flex shadow hover:shadow-xl transition-shadow duration-500 border bg-amber-400 border-indigo-600">
+                    <div
+                      className="py-32 w-full md:w-1/3 md:py-40 bg-cover bg-center "
+                      style={{
+                        backgroundImage: `url(${data.me.user.avatarImg})`,
+                      }}
+                    ></div>
+                    <div className=" md:w-2/3 grid grid-cols-3  w-full">
+                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
+                        <span className="z-10 text-black">
+                          {data.me.user.email}
+                        </span>
                         <FontAwesomeIcon
-                          icon={faCheck}
-                          className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          icon={faAt}
+                          className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
-                      ) : (
+                      </h2>
+                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
+                        <span className="z-10 text-black">
+                          {data.me.user.isVerified
+                            ? "인증 됨"
+                            : "인증되지 않음"}
+                        </span>
+                        {data.me.user.isVerified ? (
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={faTimes}
+                            className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          />
+                        )}
+                      </h2>
+                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
+                        <span className="z-10 text-black">
+                          {data.me.user.username}
+                        </span>
                         <FontAwesomeIcon
-                          icon={faTimes}
-                          className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          icon={faUserCircle}
+                          className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
-                      )}
-                    </h2>
-                    <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
-                      <span className="z-10 text-black">
-                        {data.me.user.username}
-                      </span>
-                      <FontAwesomeIcon
-                        icon={faUserCircle}
-                        className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
-                      />
-                    </h2>
+                      </h2>
+                    </div>
                   </div>
-                </div>
+                  <div className=" mt-10   shadow  transition-shadow flex justify-around items-center">
+                    <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ring-4 ring-indigo-700">
+                      보유 포인트:{" "}
+                      <span className=" font-semibold ">
+                        {myWalletData?.myWallet.wallet?.point}
+                      </span>
+                    </h1>
+                    <button className="w-full md:text-2xl bg-green-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none ring-4 ring-green-600">
+                      포인트 충전하기
+                    </button>
+                  </div>
+                </>
               )}
               {selected === UserProfileMenus.BuyingHistoryMenu && (
                 <>

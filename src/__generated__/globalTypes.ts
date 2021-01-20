@@ -21,6 +21,12 @@ export interface CreateAccountInput {
   username: string;
 }
 
+export interface JoinRoomInput {
+  userId: number;
+  productId: number;
+  price: number;
+}
+
 export interface LogInInput {
   email: string;
   password: string;

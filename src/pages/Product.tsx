@@ -1,6 +1,6 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
-import { Link, useParams } from "react-router-dom";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { PRODUCTS_FRAGMENT } from "../fragment";
 import {
   findProductById,
@@ -10,6 +10,8 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { getNameSuppressed } from "../utils";
+import { joinRoom, joinRoomVariables } from "../__generated__/joinRoom";
+import { useMe } from "../hooks/useMe";
 
 interface IParams {
   id: string;
@@ -22,28 +24,89 @@ const FIND_PRODUCT_BY_ID_QUERY = gql`
       error
       product {
         ...productsParts
+        room {
+          participantCounts
+        }
       }
     }
   }
   ${PRODUCTS_FRAGMENT}
 `;
 
-export const Product = () => {
-  const { id } = useParams<IParams>();
-  const { loading, data } = useQuery<findProductById, findProductByIdVariables>(
-    FIND_PRODUCT_BY_ID_QUERY,
-    {
-      variables: {
-        productId: +id,
-      },
+const JOIN_ROOM_MUTATION = gql`
+  mutation joinRoom($input: JoinRoomInput!) {
+    joinRoom(input: $input) {
+      ok
+      error
+      soldout
     }
-  );
+  }
+`;
+
+export const Product = () => {
+  const history = useHistory();
+  const { id } = useParams<IParams>();
+  const { data: userData } = useMe();
+  const { loading, data, refetch } = useQuery<
+    findProductById,
+    findProductByIdVariables
+  >(FIND_PRODUCT_BY_ID_QUERY, {
+    variables: {
+      productId: +id,
+    },
+  });
+  const onCompleted = (data: joinRoom) => {
+    const {
+      joinRoom: { ok, error, soldout },
+    } = data;
+    if (ok) {
+      alert("성공적으로 등록 되셨습니다.");
+      if (soldout) {
+        alert(
+          "상품의 금액 임계점을 넘은 상태이므로 랜덤으로 구매자를 뽑습니다."
+        );
+      }
+      refetch({ productId: +id });
+    }
+    if (!ok && error) {
+      alert(error);
+    }
+  };
+  const [joinRoomMutation, { data: joinRoomData }] = useMutation<
+    joinRoom,
+    joinRoomVariables
+  >(JOIN_ROOM_MUTATION, { onCompleted });
+
+  const onClickJoinRoom = async () => {
+    if (data?.findProductById.product && userData?.me.user) {
+      const joinRoomPrice = Math.ceil(data.findProductById.product.price / 100);
+      await joinRoomMutation({
+        variables: {
+          input: {
+            price: joinRoomPrice,
+            productId: data.findProductById.product.id,
+            userId: userData.me.user?.id,
+          },
+        },
+      });
+    }
+  };
+  const onClickToGoBack = () => {
+    history.goBack();
+  };
   if (loading) {
     return <LoadingSpinner />;
   }
-  console.log(data);
+  console.log(joinRoomData);
   return (
-    <div className="">
+    <div>
+      <div className="fixed top-0 left-0  ml-3 mt-5">
+        <FontAwesomeIcon
+          icon={faArrowLeft}
+          onClick={onClickToGoBack}
+          className="text-2xl 2xl:text-5xl hover:text-amber-300 transition-colors"
+        />
+      </div>
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
         <div className="flex items-center flex-col md:flex-row  pt-10 mx-5  shadow-xl">
           <div
@@ -52,7 +115,7 @@ export const Product = () => {
               backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
             }}
           ></div>
-          <div className="md:h-96 h-48  w-full bg-amber-300 text-indigo-600 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl ">
+          <div className="md:h-96 h-48  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl ">
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-300 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
@@ -73,19 +136,29 @@ export const Product = () => {
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3">
               <span>👨‍👧‍👧</span>
-              <span>15,400</span>
+              <span>
+                {data?.findProductById.product?.room?.participantCounts}
+              </span>
             </h1>
           </div>
         </div>
         {/*  */}
+
         <div className="mt-10 mx-5 grid grid-cols-2">
-          <button className="py-5 px-3 bg-amber-500 text-center font-semibold text-xl text-gray-200 rounded-l-2xl focus:ring-4 ring-amber-600 focus:outline-none">
-            현재까지 {data?.findProductById.product?.savedAmount}원
-          </button>
-          <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 ">
+          <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-xl text-gray-200 rounded-l-2xl   focus:outline-none">
+            현재까지{" "}
+            <span className="text-amber-300">
+              {data?.findProductById.product?.savedAmount}원
+            </span>
+          </div>
+          <button
+            onClick={onClickJoinRoom}
+            className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 "
+          >
             참가하기
           </button>
         </div>
+        {/*  */}
         <div className="mt-10 mx-5 pb-10">
           <h1 className="bg-gray-200 py-16 px-5 rounded-2xl shadow-2xl md:text-xl">
             {data?.findProductById.product?.description}
