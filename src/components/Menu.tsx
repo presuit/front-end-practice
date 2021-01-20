@@ -6,9 +6,11 @@ import {
   faArrowCircleRight,
   faArrowCircleLeft,
   faCommentDots,
+  faPlusCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
 import "../styles/animation.css";
+import { currentHomePage } from "../apollo";
 
 interface IHomeMenuProps {
   totalPages?: number | null;
@@ -66,11 +68,13 @@ export const Menu: React.FC<IHomeMenuProps> = ({
       if (targetIconAhead === "right") {
         if (page < totalPages) {
           setPage((prev) => prev + 1);
+          currentHomePage(page + 1);
         }
       }
       if (targetIconAhead === "left") {
         if (page > 1) {
           setPage((prev) => prev - 1);
+          currentHomePage(page - 1);
         }
       }
     }
@@ -212,6 +216,16 @@ export const Menu: React.FC<IHomeMenuProps> = ({
           </>
         )}
       </div>
+      {mode === "home" && (
+        <div className="fixed bottom-0 right-0">
+          <Link to="/product/new">
+            <FontAwesomeIcon
+              icon={faPlusCircle}
+              className="mr-2 md:mr-5 mb-7 2xl:mr-10 text-5xl text-indigo-800"
+            />
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

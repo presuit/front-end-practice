@@ -37,7 +37,7 @@ export const WalletHistory: React.FC<myWallet_myWallet_wallet_histories> = ({
 
   return (
     <Link to={`/product/${productId}`}>
-      <div className="w-full h-full transform hover:scale-110 transition-transform">
+      <div className="w-full h-full  ">
         <div className="py-5 px-5 bg-white ">
           <h1 className="md:text-3xl text-xl font-medium">
             {data?.findProductById.product?.name

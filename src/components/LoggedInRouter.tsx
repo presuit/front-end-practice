@@ -18,6 +18,7 @@ import "../styles/animation.css";
 import { NotValidUser } from "../pages/NotValidUser";
 import { Product } from "../pages/Product";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { CreateProduct } from "../pages/CreateProduct";
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
@@ -82,13 +83,18 @@ export const LoggedInRouter = () => {
       path: "/messages",
       component: Messages,
     },
-    {
-      path: "/product/:id",
-      component: Product,
-    },
+
     {
       path: "/category/:slug",
       component: Home,
+    },
+    {
+      path: "/product/new",
+      component: CreateProduct,
+    },
+    {
+      path: "/product/:id",
+      component: Product,
     },
   ];
 

@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useReactiveVar } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { ProductGridItem } from "../components/ProductGridItem";
@@ -9,6 +9,7 @@ import {
 } from "../__generated__/allProducts";
 import { PRODUCTS_FRAGMENT } from "../fragment";
 import { Menu } from "../components/Menu";
+import { currentHomePage } from "../apollo";
 
 const ALL_PRODUCTS_QUERY = gql`
   query allProducts($input: AllProductsInput!) {
@@ -28,7 +29,8 @@ const ALL_PRODUCTS_QUERY = gql`
 
 export const Home = () => {
   const history = useHistory();
-  const [page, setPage] = useState(1);
+  const currentPage = useReactiveVar(currentHomePage);
+  const [page, setPage] = useState(currentPage);
   const { data: userData, loading: userLoading } = useMe();
   const { data: productsData, loading: productsLoading, refetch } = useQuery<
     allProducts,
@@ -41,16 +43,16 @@ export const Home = () => {
     },
   });
   useEffect(() => {
-    if (!userLoading && userData?.me.user?.isVerified === false) {
-      history.push("/not-valid-user");
-    }
     refetch({ input: { page } });
   }, []);
+  if (!userLoading && userData?.me.user?.isVerified === false) {
+    history.push("/not-valid-user");
+  }
   return (
     <div>
       {!userLoading && userData?.me.user?.isVerified === true && (
         <div>
-          <div className="max-w-screen-2xl min-h-screen mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-5">
+          <div className="max-w-screen-2xl min-h-screen mx-16 2xl:mx-auto pt-10 pb-32 grid  md:grid-cols-4 gap-5 ">
             {!productsLoading &&
               productsData?.allProducts.products?.map((product) => (
                 <Link key={product.id} to={`/product/${product.id}`}>

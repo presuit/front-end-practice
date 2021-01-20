@@ -10,8 +10,10 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { WalletHistory } from "../components/WalletHistory";
+import { useReactiveVar } from "@apollo/client";
+import { currentMeMenu } from "../apollo";
 
-enum UserProfileMenus {
+export enum UserProfileMenus {
   UsernameMenu = "userProfileUsernameMenu",
   BuyingHistoryMenu = "userProfileBuyingHistoryMenu",
   SellingHistoryMenu = "userProfileSellingHistoryMenu",
@@ -21,9 +23,8 @@ export const Me = () => {
   const { data, loading } = useMe();
   const { data: myWalletData, loading: myWalletLoading } = useMyWallet();
   const history = useHistory();
-  const [selected, setSelected] = useState<string>(
-    UserProfileMenus.UsernameMenu
-  );
+  const currentMenu = useReactiveVar(currentMeMenu);
+  const [selected, setSelected] = useState<string>(currentMenu);
   const onClickMenu = (e: any) => {
     let targetMenu = e.target;
     if (targetMenu.tagName === "H2") {
@@ -39,12 +40,15 @@ export const Me = () => {
       }
       if (targetMenu.id === UserProfileMenus.BuyingHistoryMenu) {
         setSelected(UserProfileMenus.BuyingHistoryMenu);
+        currentMeMenu(UserProfileMenus.BuyingHistoryMenu);
       }
       if (targetMenu.id === UserProfileMenus.SellingHistoryMenu) {
         setSelected(UserProfileMenus.SellingHistoryMenu);
+        currentMeMenu(UserProfileMenus.SellingHistoryMenu);
       }
       if (targetMenu.id === UserProfileMenus.UsernameMenu) {
         setSelected(UserProfileMenus.UsernameMenu);
+        currentMeMenu(UserProfileMenus.UsernameMenu);
       }
     }
   };
@@ -64,12 +68,10 @@ export const Me = () => {
       selectedMenu.classList.add("bg-indigo-500", "text-amber-300");
     }
   }, [selected]);
-  useEffect(() => {
-    if (!loading && data?.me.user?.isVerified === false) {
-      history.push("/not-valid-user");
-    }
-  }, []);
 
+  if (!loading && data?.me.user?.isVerified === false) {
+    history.push("/not-valid-user");
+  }
   return (
     <div>
       {!loading && data?.me.user && (
@@ -162,13 +164,13 @@ export const Me = () => {
                     </div>
                   </div>
                   <div className=" mt-10   shadow  transition-shadow flex justify-around items-center">
-                    <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ring-4 ring-indigo-700">
+                    <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
                       보유 포인트:{" "}
                       <span className=" font-semibold ">
                         {myWalletData?.myWallet.wallet?.point}
                       </span>
                     </h1>
-                    <button className="w-full md:text-2xl bg-green-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none ring-4 ring-green-600">
+                    <button className="w-full md:text-2xl bg-teal-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none focus:ring-4 ring-teal-600 font-semibold text-gray-200 ">
                       포인트 충전하기
                     </button>
                   </div>

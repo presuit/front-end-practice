@@ -17,6 +17,7 @@ export interface findProductById_findProductById_product_category {
 export interface findProductById_findProductById_product_room {
   __typename: "Room";
   participantCounts: number;
+  isMeInRoom: boolean;
 }
 
 export interface findProductById_findProductById_product {

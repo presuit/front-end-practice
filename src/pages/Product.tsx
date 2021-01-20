@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { PRODUCTS_FRAGMENT } from "../fragment";
@@ -26,6 +26,7 @@ const FIND_PRODUCT_BY_ID_QUERY = gql`
         ...productsParts
         room {
           participantCounts
+          isMeInRoom
         }
       }
     }
@@ -46,7 +47,7 @@ const JOIN_ROOM_MUTATION = gql`
 export const Product = () => {
   const history = useHistory();
   const { id } = useParams<IParams>();
-  const { data: userData } = useMe();
+  const { data: userData, loading: userLoading } = useMe();
   const { loading, data, refetch } = useQuery<
     findProductById,
     findProductByIdVariables
@@ -55,6 +56,7 @@ export const Product = () => {
       productId: +id,
     },
   });
+
   const onCompleted = (data: joinRoom) => {
     const {
       joinRoom: { ok, error, soldout },
@@ -97,14 +99,16 @@ export const Product = () => {
   if (loading) {
     return <LoadingSpinner />;
   }
-  console.log(joinRoomData);
+  if (!userLoading && userData?.me.user?.isVerified === false) {
+    history.push("/not-valid-user");
+  }
   return (
     <div>
       <div className="fixed top-0 left-0  ml-3 mt-5">
         <FontAwesomeIcon
           icon={faArrowLeft}
           onClick={onClickToGoBack}
-          className="text-2xl 2xl:text-5xl hover:text-amber-300 transition-colors"
+          className="text-2xl 2xl:text-5xl text-amber-300 transition-colors cursor-pointer"
         />
       </div>
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
@@ -151,12 +155,18 @@ export const Product = () => {
               {data?.findProductById.product?.savedAmount}원
             </span>
           </div>
-          <button
-            onClick={onClickJoinRoom}
-            className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 "
-          >
-            참가하기
-          </button>
+          {data?.findProductById.product?.room?.isMeInRoom ? (
+            <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-amber-300 transition-colors  cursor-not-allowed">
+              이미 참여하셨습니다.
+            </button>
+          ) : (
+            <button
+              onClick={onClickJoinRoom}
+              className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 "
+            >
+              참가하기
+            </button>
+          )}
         </div>
         {/*  */}
         <div className="mt-10 mx-5 pb-10">
