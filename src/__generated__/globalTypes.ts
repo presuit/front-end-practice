@@ -21,6 +21,15 @@ export interface CreateAccountInput {
   username: string;
 }
 
+export interface CreateProductInput {
+  name: string;
+  price: number;
+  bigImg?: string | null;
+  detailImgs?: string[] | null;
+  categorySlug: string;
+  description?: string | null;
+}
+
 export interface JoinRoomInput {
   userId: number;
   productId: number;

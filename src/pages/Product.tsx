@@ -114,13 +114,13 @@ export const Product = () => {
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
         <div className="flex items-center flex-col md:flex-row  pt-10 mx-5  shadow-xl">
           <div
-            className="bg-cover bg-center  py-32 md:py-48  w-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl"
+            className="bg-cover bg-center  h-48 md:h-96  w-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900"
             style={{
               backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
             }}
           ></div>
-          <div className="md:h-96 h-48  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl ">
-            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-300 p-3 ">
+          <div className="md:h-96 h-48  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
                 <span>
@@ -128,11 +128,11 @@ export const Product = () => {
                 </span>
               )}
             </h1>
-            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-b border-indigo-300 p-3">
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-b border-indigo-500 p-3">
               <span>💲</span>
               <span>{data?.findProductById.product?.price}원</span>
             </h1>
-            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-300 p-3">
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3">
               <span>🛒</span>
               <Link to={`/category/slug`} className="hover:underline">
                 {data?.findProductById.product?.category.slug}
