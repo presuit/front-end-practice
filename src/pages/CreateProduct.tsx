@@ -4,20 +4,25 @@ import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { useMe } from "../hooks/useMe";
 import { allCategories } from "../__generated__/allCategories";
-import { createAccountVariables } from "../__generated__/createAccount";
-import { createProduct } from "../__generated__/createProduct";
-import { CreateProductInput } from "../__generated__/globalTypes";
+import {
+  createProduct,
+  createProductVariables,
+} from "../__generated__/createProduct";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
   faPlus,
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
-// @ts-ignore
-import Editor from "ckeditor5-custom-build/build/ckeditor";
-// @ts-ignore
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import "../styles/ckeditor.css";
+import axios from "axios";
+
+enum PointPercent {
+  zeroDotOne = "판매금의 0.1%",
+  one = "판매금의 1%",
+  ten = "판매금의 10%",
+  half = "판매금의 50%",
+  full = "판매금의 100%",
+}
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -41,58 +46,40 @@ const ALL_CATEGORIES_QUERY = gql`
   }
 `;
 
-const editorConfiguration = {
-  toolbar: {
-    items: [
-      "|",
-      "heading",
-      "bold",
-      "italic",
-      "link",
-      "bulletedList",
-      "numberedList",
-      "|",
-      "imageUpload",
-      "indent",
-      "outdent",
-      "|",
-      "blockQuote",
-      "undo",
-      "redo",
-      "|",
-      "fontSize",
-      "fontFamily",
-      "fontColor",
-    ],
-  },
-  ckfinder: {
-    uploadUrl: "http://localhost:4000/uploads",
-  },
-  fontSize: {
-    options: [9, 11, 13, "default", 17, 19, 21],
-  },
-};
+interface IFormProps {
+  imageUploads: FileList;
+  productName: string;
+  productPrice: string;
+  category: string;
+  pointPercent: PointPercent;
+}
 
 export const CreateProduct = () => {
+  const descriptionDivRef = useRef<HTMLDivElement>(null);
   const [previewImage, setPreviewImage] = useState<string[]>([]);
   const [currentPreview, setCurrentPreview] = useState(0);
-  const imageRef = useRef<HTMLLabelElement>(null);
   const { data: userData, loading: userLoading } = useMe();
   const { data: categoriesData } = useQuery<allCategories>(
     ALL_CATEGORIES_QUERY
   );
+  const onCompleted = (data: createProduct) => {
+    const {
+      createProduct: { ok, error, productId },
+    } = data;
+    if (ok) {
+      alert("프로덕트가 성공적으로 create 되었습니다.");
+      history.push(`/product/${productId}`);
+    } else {
+      alert("에러 발생!");
+      console.log(error);
+    }
+  };
   const [createProductMutation] = useMutation<
     createProduct,
-    createAccountVariables
-  >(CREATE_PRODUCT_MUTATION);
+    createProductVariables
+  >(CREATE_PRODUCT_MUTATION, { onCompleted });
   const history = useHistory();
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const {
-    register,
-    getValues,
-    handleSubmit,
-    errors,
-  } = useForm<CreateProductInput>({
+  const { register, getValues, handleSubmit, errors } = useForm<IFormProps>({
     mode: "onChange",
   });
   useEffect(() => {
@@ -101,19 +88,8 @@ export const CreateProduct = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (imageRef.current) {
-      imageRef.current.style.backgroundImage = `url(${previewImage[currentPreview]})`;
-      imageRef.current.style.backgroundSize = "cover";
-      imageRef.current.style.backgroundPosition = "center center";
-    }
-  }, [previewImage, currentPreview]);
-
   const onClickToGoBack = () => {
-    history.goBack();
-  };
-  const onChangeDescription = () => {
-    console.log(descriptionRef.current?.innerHTML);
+    history.push("/");
   };
   const onClickPreviewImageLeft = () => {
     if (currentPreview === 0) {
@@ -131,8 +107,48 @@ export const CreateProduct = () => {
       setCurrentPreview((prev) => prev + 1);
     }
   };
-
-  console.log(previewImage, currentPreview);
+  const onSubmit = async () => {
+    const {
+      category,
+      imageUploads,
+      pointPercent,
+      productName,
+      productPrice,
+    } = getValues();
+    const description = descriptionDivRef.current?.innerHTML;
+    const formImgData = new FormData();
+    Object.values(imageUploads).forEach((eachImg) =>
+      formImgData.append("uploads", eachImg)
+    );
+    const {
+      data,
+    }: { data: { uploaded: boolean; url: string }[] } = await axios({
+      method: "POST",
+      url: "http://localhost:4000/uploads",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formImgData,
+    });
+    if (data) {
+      data: {
+      }
+      const bigImg: string = data[0].uploaded ? data[0].url : "";
+      const detailImgs: string[] = data.map((eachData) =>
+        eachData.uploaded ? eachData.url : ""
+      );
+      await createProductMutation({
+        variables: {
+          input: {
+            categorySlug: category,
+            name: productName,
+            price: +productPrice,
+            description,
+            bigImg,
+            detailImgs,
+          },
+        },
+      });
+    }
+  };
 
   return (
     <div>
@@ -144,24 +160,29 @@ export const CreateProduct = () => {
         />
       </div>
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl">
-        <form>
-          <div className="flex  bg-indigo-800">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex">
             {previewImage && previewImage.length !== 0 && (
               <div
                 onClick={onClickPreviewImageLeft}
-                className="px-3 cursor-pointer h-48 md:h-64 xl:h-96 flex items-center justify-center"
+                className="px-3 md:px-5 cursor-pointer  flex items-center justify-center bg-indigo-900 "
               >
                 <FontAwesomeIcon
                   icon={faArrowLeft}
-                  className="md:text-4xl text-amber-400  "
+                  className="text-2xl md:text-4xl text-indigo-300  "
                 />
               </div>
             )}
             <label
-              ref={imageRef}
               htmlFor="imageUploads"
-              className="h-48 md:h-64 xl:h-96 bg-indigo-800 w-full flex justify-center items-center cursor-pointer"
+              className=" h-64 md:h-96 bg-indigo-800 w-full flex justify-center items-center cursor-pointer"
             >
+              {previewImage && previewImage.length !== 0 && (
+                <img
+                  src={previewImage[currentPreview]}
+                  className="max-h-full  max-w-full"
+                />
+              )}
               {previewImage && previewImage.length === 0 && (
                 <FontAwesomeIcon
                   icon={faPlus}
@@ -172,11 +193,11 @@ export const CreateProduct = () => {
             {previewImage && previewImage.length !== 0 && (
               <div
                 onClick={onClickPreviewImageRight}
-                className="px-3 cursor-pointer h-48 md:h-64 xl:h-96 flex items-center justify-center"
+                className="px-3 md:px-5 cursor-pointer  flex items-center justify-center bg-indigo-900   "
               >
                 <FontAwesomeIcon
                   icon={faArrowRight}
-                  className="text-base md:text-4xl text-amber-400  "
+                  className="text-2xl md:text-4xl text-indigo-300   "
                 />
               </div>
             )}
@@ -190,6 +211,9 @@ export const CreateProduct = () => {
             accept="image/*"
             multiple={true}
             onInput={() => {
+              if (previewImage.length !== 0) {
+                setPreviewImage([]);
+              }
               const fileList: FileList = getValues("imageUploads");
               const keys = Object.keys(fileList);
               for (const key of keys) {
@@ -198,20 +222,18 @@ export const CreateProduct = () => {
               }
             }}
           />
-          <div className="grid grid-cols-5 grid-rows-2 ">
-            <input
-              style={{ gridColumn: "1/-3" }}
-              ref={register}
-              type="text"
-              required
-              name="productName"
-              placeholder="상품 이름 (20자 이하로 작성해 주세요)"
-              className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white"
-            />
-            <div
-              className="flex items-center bg-indigo-600"
-              style={{ gridColumn: "1/-3" }}
-            >
+          <div className="grid grid-cols-5 grid-rows-4 md:grid-rows-2 ">
+            <div className="col-start-1 col-span-5 md:col-start-1 md:col-span-3">
+              <input
+                ref={register}
+                type="text"
+                required
+                name="productName"
+                placeholder="상품 이름 (20자 이하로 작성해 주세요)"
+                className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
+              />
+            </div>
+            <div className="flex items-center bg-indigo-600 row-start-2 row-span-1 col-start-1 col-span-5 md:col-start-1 md:col-span-3 md:row-start-2 md:row-span-1">
               <input
                 ref={register}
                 type="text"
@@ -225,35 +247,38 @@ export const CreateProduct = () => {
               </span>
             </div>
 
-            <select
-              style={{ gridColumn: "-3/-1", gridRow: "1/ 2" }}
-              className="bg-indigo-400 text-xs md:text-xl font-semibold text-amber-300 focus:outline-none "
-            >
-              {categoriesData?.allCategories.categories &&
-                categoriesData?.allCategories.categories.map(
-                  (category, index) => (
-                    <option key={index} className="text-white ">
-                      {category.slug}
-                    </option>
-                  )
-                )}
-            </select>
-            <select
-              style={{ gridRow: "2/-1", gridColumn: "-3/-1" }}
-              className="bg-indigo-500 focus:outline-none text-xs md:text-xl font-semibold text-amber-300"
-            >
-              <option className="text-white">판매금의 0.1%</option>
-              <option className="text-white">판매금의 1%</option>
-              <option className="text-white">판매금의 10%</option>
-              <option className="text-white">판매금의 50%</option>
-              <option className="text-white">판매금의 100%</option>
-            </select>
+            <div className="col-span-full row-start-3 row-span-1 md:col-start-4 md:col-span-2 md:row-start-1 md:row-span-1">
+              <select
+                ref={register}
+                name="category"
+                className="bg-indigo-400 text-xs md:text-xl font-semibold text-amber-300 focus:outline-none w-full h-full "
+              >
+                {categoriesData?.allCategories.categories &&
+                  categoriesData?.allCategories.categories.map(
+                    (category, index) => (
+                      <option key={index} className="text-white ">
+                        {category.slug}
+                      </option>
+                    )
+                  )}
+              </select>
+            </div>
+            <div className="col-span-full row-start-4 row-span-1 md:col-start-4 md:col-span-2 md:row-start-2 md:row-span-1">
+              <select
+                ref={register}
+                name="pointPercent"
+                className="bg-indigo-500 focus:outline-none text-xs md:text-xl font-semibold text-amber-300 w-full h-full"
+              >
+                {Object.values(PointPercent).map((value) => (
+                  <option className="text-amber-300">{value}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="pb-14">
+          <div className="mb-14 py-12 px-10 bg-indigo-800">
             <div
-              onInput={onChangeDescription}
-              ref={descriptionRef}
-              className="w-full px-10 py-5 focus:outline-none bg-indigo-900 text-amber-300 text-base md:text-xl"
+              ref={descriptionDivRef}
+              className="w-full rounded-lg px-5 py-5 focus:outline-none bg-indigo-100 text-black text-sm md:text-xl"
               contentEditable={true}
               style={{ minHeight: "500px" }}
             />
@@ -261,7 +286,7 @@ export const CreateProduct = () => {
           <div className="pb-10 flex justify-center items-center">
             <button
               type="submit"
-              className="py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-indigo-900 rounded-full text-amber-300 focus:outline-none"
+              className="py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500 rounded-full text-gray-200 focus:outline-none focus:ring-4 ring-teal-600"
             >
               완료
             </button>

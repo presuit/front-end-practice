@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { PRODUCTS_FRAGMENT } from "../fragment";
@@ -46,6 +46,7 @@ const JOIN_ROOM_MUTATION = gql`
 
 export const Product = () => {
   const history = useHistory();
+  const descriptionRef = useRef<HTMLHeadingElement>(null);
   const { id } = useParams<IParams>();
   const { data: userData, loading: userLoading } = useMe();
   const { loading, data, refetch } = useQuery<
@@ -94,13 +95,17 @@ export const Product = () => {
     }
   };
   const onClickToGoBack = () => {
-    history.goBack();
+    history.push("/");
   };
   if (loading) {
     return <LoadingSpinner />;
   }
   if (!userLoading && userData?.me.user?.isVerified === false) {
     history.push("/not-valid-user");
+  }
+  if (data?.findProductById.product?.description && descriptionRef.current) {
+    descriptionRef.current.innerHTML =
+      data.findProductById.product?.description;
   }
   return (
     <div>
@@ -170,9 +175,10 @@ export const Product = () => {
         </div>
         {/*  */}
         <div className="mt-10 mx-5 pb-10">
-          <h1 className="bg-gray-200 py-16 px-5 rounded-2xl shadow-2xl md:text-xl">
-            {data?.findProductById.product?.description}
-          </h1>
+          <h1
+            ref={descriptionRef}
+            className="bg-gray-200 py-16 px-5 rounded-2xl shadow-2xl md:text-xl"
+          ></h1>
         </div>
       </div>
     </div>
