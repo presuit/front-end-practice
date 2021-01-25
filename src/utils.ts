@@ -39,4 +39,8 @@ export const getNameSuppressed = (name: string): string => {
   return newName;
 };
 
+export const numberWithCommas = (price: number) => {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 export {};

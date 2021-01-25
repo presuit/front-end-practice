@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AllProductsInput } from "./globalTypes";
+import { AllProductsInput, PointPercent } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: allProducts
@@ -24,6 +24,8 @@ export interface allProducts_allProducts_products {
   bigImg: string | null;
   savedAmount: number;
   description: string | null;
+  pointPercent: PointPercent;
+  soldout: boolean;
   category: allProducts_allProducts_products_category;
 }
 

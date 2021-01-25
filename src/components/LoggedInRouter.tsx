@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,13 +12,52 @@ import { Me } from "../pages/Me";
 import { Messages } from "../pages/Messages";
 import { UserProfile } from "../pages/UserProfile";
 import { ValidationCode } from "../pages/ValidateCode";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "../styles/animation.css";
 import { NotValidUser } from "../pages/NotValidUser";
 import { Product } from "../pages/Product";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { CreateProduct } from "../pages/CreateProduct";
+
+const routes = [
+  {
+    path: "/",
+    component: Home,
+    exact: true,
+  },
+  {
+    path: "/not-valid-user",
+    component: NotValidUser,
+  },
+  {
+    path: "/validate-code",
+    component: ValidationCode,
+  },
+  {
+    path: "/me",
+    component: Me,
+  },
+  {
+    path: "/users/:id",
+    component: UserProfile,
+  },
+  {
+    path: "/messages",
+    component: Messages,
+  },
+
+  {
+    path: "/category/:slug",
+    component: Home,
+  },
+  {
+    path: "/product/new",
+    component: CreateProduct,
+  },
+  {
+    path: "/product/:id",
+    component: Product,
+  },
+];
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
@@ -30,7 +69,12 @@ export const LoggedInRouter = () => {
     window.location.href = "/";
     window.location.reload();
   };
-  if (!loading && error) {
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
     return (
       <>
         <div className="h-screen flex flex-col items-center justify-center  px-16">
@@ -52,51 +96,6 @@ export const LoggedInRouter = () => {
       </>
     );
   }
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  const routes = [
-    {
-      path: "/",
-      component: Home,
-      exact: true,
-    },
-    {
-      path: "/not-valid-user",
-      component: NotValidUser,
-    },
-    {
-      path: "/validate-code",
-      component: ValidationCode,
-    },
-    {
-      path: "/me",
-      component: Me,
-    },
-    {
-      path: "/users/:id",
-      component: UserProfile,
-    },
-    {
-      path: "/messages",
-      component: Messages,
-    },
-
-    {
-      path: "/category/:slug",
-      component: Home,
-    },
-    {
-      path: "/product/new",
-      component: CreateProduct,
-    },
-    {
-      path: "/product/:id",
-      component: Product,
-    },
-  ];
 
   return (
     <Router>

@@ -7,6 +7,14 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum PointPercent {
+  full = "full",
+  half = "half",
+  one = "one",
+  ten = "ten",
+  zeroDotOne = "zeroDotOne",
+}
+
 export interface AllProductsInput {
   page?: number | null;
 }
@@ -24,6 +32,7 @@ export interface CreateAccountInput {
 export interface CreateProductInput {
   name: string;
   price: number;
+  pointPercent: PointPercent;
   bigImg?: string | null;
   detailImgs?: string[] | null;
   categorySlug: string;

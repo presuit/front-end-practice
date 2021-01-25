@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { isLoggedIn } from "../apollo";
 import { ConfirmVerificationCodeInput } from "../__generated__/globalTypes";
 
 export const NotValidUser = () => {
@@ -14,6 +15,11 @@ export const NotValidUser = () => {
   const onClickValidation = () => {
     const { code } = getValues();
     history.push(`/validate-code?code=${code}`);
+  };
+  const onClickToResetToken = () => {
+    localStorage.removeItem("token");
+    isLoggedIn(false);
+    history.push("/");
   };
   return (
     <div>
@@ -41,9 +47,16 @@ export const NotValidUser = () => {
                 {errors.code?.message}
               </h2>
             )}
-            <button className="mt-3 border px-5 py-2  font-medium text-md hover:bg-green-600 hover:text-white transition-colors ">
+            <button className="mt-3 border px-5 py-2  font-medium text-md hover:bg-teal-600 hover:text-white transition-colors mr-5">
               확인
             </button>
+            <Link
+              onClick={onClickToResetToken}
+              className="mt-5 text-base"
+              to="/"
+            >
+              홈페이지로 돌아가기
+            </Link>
           </form>
         </div>
       </div>

@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { PointPercent } from "./globalTypes";
+
 // ====================================================
 // GraphQL query operation: findProductById
 // ====================================================
@@ -28,6 +30,8 @@ export interface findProductById_findProductById_product {
   bigImg: string | null;
   savedAmount: number;
   description: string | null;
+  pointPercent: PointPercent;
+  soldout: boolean;
   category: findProductById_findProductById_product_category;
   room: findProductById_findProductById_product_room | null;
 }

@@ -9,9 +9,10 @@ import {
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { getNameSuppressed } from "../utils";
+import { getNameSuppressed, numberWithCommas } from "../utils";
 import { joinRoom, joinRoomVariables } from "../__generated__/joinRoom";
 import { useMe } from "../hooks/useMe";
+import { PointPercent } from "../__generated__/globalTypes";
 
 interface IParams {
   id: string;
@@ -46,7 +47,7 @@ const JOIN_ROOM_MUTATION = gql`
 
 export const Product = () => {
   const history = useHistory();
-  const descriptionRef = useRef<HTMLHeadingElement>(null);
+  const descriptionContainer = useRef<HTMLHeadingElement>(null);
   const { id } = useParams<IParams>();
   const { data: userData, loading: userLoading } = useMe();
   const { loading, data, refetch } = useQuery<
@@ -75,14 +76,40 @@ export const Product = () => {
       alert(error);
     }
   };
-  const [joinRoomMutation, { data: joinRoomData }] = useMutation<
-    joinRoom,
-    joinRoomVariables
-  >(JOIN_ROOM_MUTATION, { onCompleted });
+  const [joinRoomMutation] = useMutation<joinRoom, joinRoomVariables>(
+    JOIN_ROOM_MUTATION,
+    { onCompleted }
+  );
+
+  const getRoomPrice = (value: PointPercent): number => {
+    let percent: number = 1;
+    if (data?.findProductById.product?.price) {
+      if (value === PointPercent.full) {
+        percent = 1;
+      }
+      if (value === PointPercent.half) {
+        percent = 0.5;
+      }
+      if (value === PointPercent.one) {
+        percent = 0.01;
+      }
+      if (value === PointPercent.ten) {
+        percent = 0.1;
+      }
+      if (value === PointPercent.zeroDotOne) {
+        percent = 0.001;
+      }
+      return Math.ceil(data.findProductById.product.price * percent);
+    } else {
+      throw Error("room Price를 구하지 못했습니다.");
+    }
+  };
 
   const onClickJoinRoom = async () => {
     if (data?.findProductById.product && userData?.me.user) {
-      const joinRoomPrice = Math.ceil(data.findProductById.product.price / 100);
+      const joinRoomPrice = getRoomPrice(
+        data.findProductById.product.pointPercent
+      );
       await joinRoomMutation({
         variables: {
           input: {
@@ -97,16 +124,26 @@ export const Product = () => {
   const onClickToGoBack = () => {
     history.push("/");
   };
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+
   if (!userLoading && userData?.me.user?.isVerified === false) {
     history.push("/not-valid-user");
   }
-  if (data?.findProductById.product?.description && descriptionRef.current) {
-    descriptionRef.current.innerHTML =
-      data.findProductById.product?.description;
+
+  useEffect(() => {
+    if (data?.findProductById.product?.description) {
+      if (descriptionContainer.current) {
+        descriptionContainer.current.innerHTML =
+          data.findProductById.product.description;
+      }
+    }
+  }, [data]);
+
+  if (loading) {
+    return <LoadingSpinner />;
   }
+
+  console.log(data);
+
   return (
     <div>
       <div className="fixed top-0 left-0  ml-3 mt-5">
@@ -124,7 +161,7 @@ export const Product = () => {
               backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
             }}
           ></div>
-          <div className="md:h-96 h-48  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
+          <div className="md:h-96  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
@@ -135,7 +172,22 @@ export const Product = () => {
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-b border-indigo-500 p-3">
               <span>💲</span>
-              <span>{data?.findProductById.product?.price}원</span>
+              {data?.findProductById.product?.price ? (
+                <span>
+                  {numberWithCommas(data?.findProductById.product?.price)}원
+                </span>
+              ) : (
+                <span>가격이 정해지지 않았습니다.</span>
+              )}
+              {data?.findProductById.product?.pointPercent && (
+                <span className="text-xs md:text-base mt-3">
+                  (응모당{" "}
+                  {numberWithCommas(
+                    getRoomPrice(data.findProductById.product.pointPercent)
+                  )}
+                  원)
+                </span>
+              )}
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3">
               <span>🛒</span>
@@ -153,30 +205,42 @@ export const Product = () => {
         </div>
         {/*  */}
 
-        <div className="mt-10 mx-5 grid grid-cols-2">
-          <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-xl text-gray-200 rounded-l-2xl   focus:outline-none">
-            현재까지{" "}
-            <span className="text-amber-300">
-              {data?.findProductById.product?.savedAmount}원
-            </span>
+        <div className="mt-10 mx-5 flex items-center justify-center  ">
+          <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-base md:text-xl text-gray-200 rounded-l-2xl   focus:outline-none w-1/2">
+            {data?.findProductById.product?.soldout ? (
+              <span>soldout!</span>
+            ) : (
+              <>
+                {" "}
+                <span>현재까지 </span>
+                <span className="text-amber-300">
+                  {numberWithCommas(
+                    data?.findProductById.product?.savedAmount || 0
+                  )}
+                  원
+                </span>
+              </>
+            )}
           </div>
-          {data?.findProductById.product?.room?.isMeInRoom ? (
-            <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-amber-300 transition-colors  cursor-not-allowed">
-              이미 참여하셨습니다.
-            </button>
-          ) : (
-            <button
-              onClick={onClickJoinRoom}
-              className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 "
-            >
-              참가하기
-            </button>
-          )}
+          <div className="w-1/2">
+            {data?.findProductById.product?.room?.isMeInRoom ? (
+              <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-amber-300 transition-colors  cursor-not-allowed w-full ">
+                이미 참여하셨습니다.
+              </button>
+            ) : (
+              <button
+                onClick={onClickJoinRoom}
+                className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 w-full "
+              >
+                참가하기
+              </button>
+            )}
+          </div>
         </div>
         {/*  */}
         <div className="mt-10 mx-5 pb-10">
           <h1
-            ref={descriptionRef}
+            ref={descriptionContainer}
             className="bg-gray-200 py-16 px-5 rounded-2xl shadow-2xl md:text-xl"
           ></h1>
         </div>

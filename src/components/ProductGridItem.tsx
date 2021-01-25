@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { getNameSuppressed } from "../utils";
+import { getNameSuppressed, numberWithCommas } from "../utils";
 
 interface IProps {
   name: string;
@@ -20,7 +20,7 @@ export const ProductGridItem: React.FC<IProps> = ({ bigImg, name, price }) => {
           {getNameSuppressed(name)}
         </h1>
         <h1 className="flex justify-center items-center text-amber-300 font-semibold text-xl md:text-base lg:text-xl xl:text-2xl px-3">
-          {price}원
+          {numberWithCommas(price)}원
         </h1>
       </div>
     </div>

@@ -15,14 +15,7 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-
-enum PointPercent {
-  zeroDotOne = "판매금의 0.1%",
-  one = "판매금의 1%",
-  ten = "판매금의 10%",
-  half = "판매금의 50%",
-  full = "판매금의 100%",
-}
+import { PointPercent } from "../__generated__/globalTypes";
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -51,11 +44,12 @@ interface IFormProps {
   productName: string;
   productPrice: string;
   category: string;
-  pointPercent: PointPercent;
+  pointPercentKor: string;
 }
 
 export const CreateProduct = () => {
   const descriptionDivRef = useRef<HTMLDivElement>(null);
+  let pointPercent = PointPercent.zeroDotOne;
   const [previewImage, setPreviewImage] = useState<string[]>([]);
   const [currentPreview, setCurrentPreview] = useState(0);
   const { data: userData, loading: userLoading } = useMe();
@@ -107,15 +101,34 @@ export const CreateProduct = () => {
       setCurrentPreview((prev) => prev + 1);
     }
   };
+  const parsePointPercentKorToEnum = (value: string): PointPercent => {
+    if (value === "가격의 100%") {
+      return PointPercent.full;
+    }
+    if (value === "가격의 50%") {
+      return PointPercent.half;
+    }
+    if (value === "가격의 1%") {
+      return PointPercent.one;
+    }
+    if (value === "가격의 10%") {
+      return PointPercent.ten;
+    }
+    if (value === "가격의 0.1%") {
+      return PointPercent.zeroDotOne;
+    }
+    return PointPercent.zeroDotOne;
+  };
   const onSubmit = async () => {
     const {
       category,
       imageUploads,
-      pointPercent,
       productName,
       productPrice,
+      pointPercentKor,
     } = getValues();
     const description = descriptionDivRef.current?.innerHTML;
+    const pointPercent = parsePointPercentKorToEnum(pointPercentKor);
     const formImgData = new FormData();
     Object.values(imageUploads).forEach((eachImg) =>
       formImgData.append("uploads", eachImg)
@@ -129,8 +142,6 @@ export const CreateProduct = () => {
       data: formImgData,
     });
     if (data) {
-      data: {
-      }
       const bigImg: string = data[0].uploaded ? data[0].url : "";
       const detailImgs: string[] = data.map((eachData) =>
         eachData.uploaded ? eachData.url : ""
@@ -144,9 +155,28 @@ export const CreateProduct = () => {
             description,
             bigImg,
             detailImgs,
+            pointPercent,
           },
         },
       });
+    }
+  };
+
+  const generatePointPercentOption = (value: PointPercent) => {
+    if (value === PointPercent.full) {
+      return "가격의 100%";
+    }
+    if (value === PointPercent.half) {
+      return "가격의 50%";
+    }
+    if (value === PointPercent.one) {
+      return "가격의 1%";
+    }
+    if (value === PointPercent.ten) {
+      return "가격의 10%";
+    }
+    if (value === PointPercent.zeroDotOne) {
+      return "가격의 0.1%";
     }
   };
 
@@ -266,11 +296,13 @@ export const CreateProduct = () => {
             <div className="col-span-full row-start-4 row-span-1 md:col-start-4 md:col-span-2 md:row-start-2 md:row-span-1">
               <select
                 ref={register}
-                name="pointPercent"
+                name="pointPercentKor"
                 className="bg-indigo-500 focus:outline-none text-xs md:text-xl font-semibold text-amber-300 w-full h-full"
               >
-                {Object.values(PointPercent).map((value) => (
-                  <option className="text-amber-300">{value}</option>
+                {Object.values(PointPercent).map((value, index) => (
+                  <option key={index} className="text-amber-300">
+                    {generatePointPercentOption(value)}
+                  </option>
                 ))}
               </select>
             </div>

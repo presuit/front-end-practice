@@ -8,6 +8,8 @@ export const PRODUCTS_FRAGMENT = gql`
     bigImg
     savedAmount
     description
+    pointPercent
+    soldout
     category {
       id
       name
