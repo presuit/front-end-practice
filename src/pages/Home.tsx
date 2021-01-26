@@ -32,10 +32,12 @@ export const Home = () => {
   const currentPage = useReactiveVar(currentHomePage);
   const [page, setPage] = useState(currentPage);
   const { data: userData, loading: userLoading } = useMe();
-  const { data: productsData, loading: productsLoading, refetch } = useQuery<
-    allProducts,
-    allProductsVariables
-  >(ALL_PRODUCTS_QUERY, {
+  const {
+    data: productsData,
+    loading: productsLoading,
+    refetch,
+    error,
+  } = useQuery<allProducts, allProductsVariables>(ALL_PRODUCTS_QUERY, {
     variables: {
       input: {
         page,
@@ -48,6 +50,7 @@ export const Home = () => {
   if (!userLoading && userData?.me.user?.isVerified === false) {
     history.push("/not-valid-user");
   }
+  console.log(productsData, error);
   return (
     <div>
       {!userLoading && userData?.me.user?.isVerified === true && (

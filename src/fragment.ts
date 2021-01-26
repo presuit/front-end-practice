@@ -6,6 +6,9 @@ export const PRODUCTS_FRAGMENT = gql`
     name
     price
     bigImg
+    detailImgs {
+      source
+    }
     savedAmount
     description
     pointPercent

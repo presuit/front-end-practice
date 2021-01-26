@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { PRODUCTS_FRAGMENT } from "../fragment";
@@ -13,6 +13,7 @@ import { getNameSuppressed, numberWithCommas } from "../utils";
 import { joinRoom, joinRoomVariables } from "../__generated__/joinRoom";
 import { useMe } from "../hooks/useMe";
 import { PointPercent } from "../__generated__/globalTypes";
+import { FullSizeImgBoard } from "../components/FullSizeImgBoard";
 
 interface IParams {
   id: string;
@@ -25,6 +26,14 @@ const FIND_PRODUCT_BY_ID_QUERY = gql`
       error
       product {
         ...productsParts
+        seller {
+          id
+          username
+        }
+        buyer {
+          id
+          username
+        }
         room {
           participantCounts
           isMeInRoom
@@ -48,6 +57,7 @@ const JOIN_ROOM_MUTATION = gql`
 export const Product = () => {
   const history = useHistory();
   const descriptionContainer = useRef<HTMLHeadingElement>(null);
+  const [fullSizeMode, setFullSizeMode] = useState<boolean>(false);
   const { id } = useParams<IParams>();
   const { data: userData, loading: userLoading } = useMe();
   const { loading, data, refetch } = useQuery<
@@ -122,12 +132,18 @@ export const Product = () => {
     }
   };
   const onClickToGoBack = () => {
-    history.push("/");
+    history.goBack();
   };
 
-  if (!userLoading && userData?.me.user?.isVerified === false) {
-    history.push("/not-valid-user");
-  }
+  const onClickFullSizeImg = () => {
+    setFullSizeMode(true);
+  };
+
+  useEffect(() => {
+    if (!userLoading && userData?.me.user?.isVerified === false) {
+      history.push("/not-valid-user");
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (data?.findProductById.product?.description) {
@@ -146,6 +162,7 @@ export const Product = () => {
 
   return (
     <div>
+      {/* 뒤로 가기 버튼 */}
       <div className="fixed top-0 left-0  ml-3 mt-5">
         <FontAwesomeIcon
           icon={faArrowLeft}
@@ -153,14 +170,29 @@ export const Product = () => {
           className="text-2xl 2xl:text-5xl text-amber-300 transition-colors cursor-pointer"
         />
       </div>
+      {data?.findProductById.product?.detailImgs && (
+        <FullSizeImgBoard
+          fullSizeMode={fullSizeMode}
+          setFullSizeMode={setFullSizeMode}
+          detailImgs={data?.findProductById.product?.detailImgs}
+        />
+      )}
+      {/* 메인 프레임  */}
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
-        <div className="flex items-center flex-col md:flex-row  pt-10 mx-5  shadow-xl">
-          <div
-            className="bg-cover bg-center  h-48 md:h-96  w-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900"
-            style={{
-              backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
-            }}
-          ></div>
+        {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
+        <div className="flex items-center flex-col md:flex-row  pt-10 mx-5  shadow-xl ">
+          {/* 프로덕트 사진 */}
+          <div className="  h-64 md:h-96  w-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900 overflow-hidden  ">
+            <div
+              onClick={onClickFullSizeImg}
+              className="w-full h-full bg-cover bg-center transform hover:scale-110 transition-transform cursor-pointer z-0"
+              style={{
+                transitionDuration: "0.6s",
+                backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
+              }}
+            ></div>
+          </div>
+          {/* 프로덕트 디테일 정보 */}
           <div className="md:h-96  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
@@ -189,22 +221,48 @@ export const Product = () => {
                 </span>
               )}
             </h1>
-            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3">
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3 border-b">
               <span>🛒</span>
               <Link to={`/category/slug`} className="hover:underline">
                 {data?.findProductById.product?.category.slug}
               </Link>
             </h1>
-            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3">
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3 border-b border-indigo-500">
               <span>👨‍👧‍👧</span>
               <span>
                 {data?.findProductById.product?.room?.participantCounts}
               </span>
             </h1>
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3 border-r border-indigo-500">
+              <span className="text-xs md:text-lg">판매자</span>
+              <span>
+                <Link
+                  className="hover:underline"
+                  to={`/users/${data?.findProductById.product?.seller.id}`}
+                >
+                  {data?.findProductById.product?.seller.username}
+                </Link>
+              </span>
+            </h1>
+            <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3">
+              <span className="text-xs md:text-lg">구매자</span>
+              {data?.findProductById.product?.buyer ? (
+                <span>
+                  <Link
+                    className="hover:underline"
+                    to={`/users/${data?.findProductById.product?.buyer.id}`}
+                  >
+                    {data.findProductById.product.buyer.username}
+                  </Link>
+                </span>
+              ) : (
+                <span className="text-lg">구매자가 아직 없습니다.</span>
+              )}
+            </h1>
           </div>
         </div>
-        {/*  */}
 
+        {/* 프로덕트 모인 금액과 참가하는 버튼이 존재하는 부분 */}
         <div className="mt-10 mx-5 flex items-center justify-center  ">
           <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-base md:text-xl text-gray-200 rounded-l-2xl   focus:outline-none w-1/2">
             {data?.findProductById.product?.soldout ? (
@@ -228,16 +286,24 @@ export const Product = () => {
                 이미 참여하셨습니다.
               </button>
             ) : (
-              <button
-                onClick={onClickJoinRoom}
-                className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 w-full "
-              >
-                참가하기
-              </button>
+              <>
+                {data?.findProductById.product?.soldout ? (
+                  <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-amber-300 transition-colors  cursor-not-allowed w-full ">
+                    SoldOut!
+                  </button>
+                ) : (
+                  <button
+                    onClick={onClickJoinRoom}
+                    className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-gray-200 hover:text-amber-300 transition-colors focus:ring-4 ring-teal-600 w-full "
+                  >
+                    참가하기
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
-        {/*  */}
+        {/* 프로덕트 세부 설명 컴포넌트 */}
         <div className="mt-10 mx-5 pb-10">
           <h1
             ref={descriptionContainer}

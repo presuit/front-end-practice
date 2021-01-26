@@ -9,6 +9,11 @@ import { AllProductsInput, PointPercent } from "./globalTypes";
 // GraphQL query operation: allProducts
 // ====================================================
 
+export interface allProducts_allProducts_products_detailImgs {
+  __typename: "DetailImg";
+  source: string;
+}
+
 export interface allProducts_allProducts_products_category {
   __typename: "Category";
   id: number;
@@ -22,6 +27,7 @@ export interface allProducts_allProducts_products {
   name: string;
   price: number;
   bigImg: string | null;
+  detailImgs: allProducts_allProducts_products_detailImgs[] | null;
   savedAmount: number;
   description: string | null;
   pointPercent: PointPercent;

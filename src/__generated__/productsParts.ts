@@ -9,6 +9,11 @@ import { PointPercent } from "./globalTypes";
 // GraphQL fragment: productsParts
 // ====================================================
 
+export interface productsParts_detailImgs {
+  __typename: "DetailImg";
+  source: string;
+}
+
 export interface productsParts_category {
   __typename: "Category";
   id: number;
@@ -22,6 +27,7 @@ export interface productsParts {
   name: string;
   price: number;
   bigImg: string | null;
+  detailImgs: productsParts_detailImgs[] | null;
   savedAmount: number;
   description: string | null;
   pointPercent: PointPercent;

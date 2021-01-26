@@ -72,6 +72,8 @@ export const Me = () => {
   if (!loading && data?.me.user?.isVerified === false) {
     history.push("/not-valid-user");
   }
+
+  console.log(currentMenu, selected);
   return (
     <div>
       {!loading && data?.me.user && (
@@ -79,16 +81,16 @@ export const Me = () => {
           <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
             <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
               <div
-                id="userProfileUsernameMenu"
+                id={UserProfileMenus.UsernameMenu}
                 onClick={onClickMenu}
-                className="w-full py-5 bg-indigo-500 text-amber-300  cursor-pointer overflow-hidden"
+                className="w-full py-5   cursor-pointer overflow-hidden"
               >
                 <h2 className="text-xs md:text-xl text-center font-semibold uppercase">
                   {data.me.user.username}
                 </h2>
               </div>
               <div
-                id="userProfileBuyingHistoryMenu"
+                id={UserProfileMenus.BuyingHistoryMenu}
                 onClick={onClickMenu}
                 className="w-full py-5 cursor-pointer "
               >
@@ -97,7 +99,7 @@ export const Me = () => {
                 </h2>
               </div>
               <div
-                id="userProfileSellingHistoryMenu"
+                id={UserProfileMenus.SellingHistoryMenu}
                 onClick={onClickMenu}
                 className="w-full py-5 cursor-pointer  "
               >
