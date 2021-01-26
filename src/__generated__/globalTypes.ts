@@ -39,6 +39,10 @@ export interface CreateProductInput {
   description?: string | null;
 }
 
+export interface FindUserByIdInput {
+  userId: number;
+}
+
 export interface JoinRoomInput {
   userId: number;
   productId: number;

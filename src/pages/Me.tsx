@@ -13,10 +13,10 @@ import { WalletHistory } from "../components/WalletHistory";
 import { useReactiveVar } from "@apollo/client";
 import { currentMeMenu } from "../apollo";
 
-export enum UserProfileMenus {
-  UsernameMenu = "userProfileUsernameMenu",
-  BuyingHistoryMenu = "userProfileBuyingHistoryMenu",
-  SellingHistoryMenu = "userProfileSellingHistoryMenu",
+export enum MeMenus {
+  UsernameMenu = "meUsernameMenu",
+  BuyingHistoryMenu = "meBuyingHistoryMenu",
+  SellingHistoryMenu = "meSellingHistoryMenu",
 }
 
 export const Me = () => {
@@ -25,6 +25,7 @@ export const Me = () => {
   const history = useHistory();
   const currentMenu = useReactiveVar(currentMeMenu);
   const [selected, setSelected] = useState<string>(currentMenu);
+
   const onClickMenu = (e: any) => {
     let targetMenu = e.target;
     if (targetMenu.tagName === "H2") {
@@ -38,17 +39,17 @@ export const Me = () => {
         const selectedMenu = document.getElementById(selected);
         selectedMenu?.classList.remove("bg-indigo-500", "text-amber-300");
       }
-      if (targetMenu.id === UserProfileMenus.BuyingHistoryMenu) {
-        setSelected(UserProfileMenus.BuyingHistoryMenu);
-        currentMeMenu(UserProfileMenus.BuyingHistoryMenu);
+      if (targetMenu.id === MeMenus.BuyingHistoryMenu) {
+        setSelected(MeMenus.BuyingHistoryMenu);
+        currentMeMenu(MeMenus.BuyingHistoryMenu);
       }
-      if (targetMenu.id === UserProfileMenus.SellingHistoryMenu) {
-        setSelected(UserProfileMenus.SellingHistoryMenu);
-        currentMeMenu(UserProfileMenus.SellingHistoryMenu);
+      if (targetMenu.id === MeMenus.SellingHistoryMenu) {
+        setSelected(MeMenus.SellingHistoryMenu);
+        currentMeMenu(MeMenus.SellingHistoryMenu);
       }
-      if (targetMenu.id === UserProfileMenus.UsernameMenu) {
-        setSelected(UserProfileMenus.UsernameMenu);
-        currentMeMenu(UserProfileMenus.UsernameMenu);
+      if (targetMenu.id === MeMenus.UsernameMenu) {
+        setSelected(MeMenus.UsernameMenu);
+        currentMeMenu(MeMenus.UsernameMenu);
       }
     }
   };
@@ -69,11 +70,14 @@ export const Me = () => {
     }
   }, [selected]);
 
-  if (!loading && data?.me.user?.isVerified === false) {
-    history.push("/not-valid-user");
-  }
+  useEffect(() => {
+    if (data?.me.user?.isVerified === false) {
+      history.push("/not-valid-user");
+    }
+  }, [data]);
 
-  console.log(currentMenu, selected);
+  console.log(myWalletData);
+
   return (
     <div>
       {!loading && data?.me.user && (
@@ -81,7 +85,7 @@ export const Me = () => {
           <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
             <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
               <div
-                id={UserProfileMenus.UsernameMenu}
+                id={MeMenus.UsernameMenu}
                 onClick={onClickMenu}
                 className="w-full py-5   cursor-pointer overflow-hidden"
               >
@@ -90,7 +94,7 @@ export const Me = () => {
                 </h2>
               </div>
               <div
-                id={UserProfileMenus.BuyingHistoryMenu}
+                id={MeMenus.BuyingHistoryMenu}
                 onClick={onClickMenu}
                 className="w-full py-5 cursor-pointer "
               >
@@ -99,7 +103,7 @@ export const Me = () => {
                 </h2>
               </div>
               <div
-                id={UserProfileMenus.SellingHistoryMenu}
+                id={MeMenus.SellingHistoryMenu}
                 onClick={onClickMenu}
                 className="w-full py-5 cursor-pointer  "
               >
@@ -117,7 +121,7 @@ export const Me = () => {
               </div>
             </header>
             <main className="p-5">
-              {selected === UserProfileMenus.UsernameMenu && (
+              {selected === MeMenus.UsernameMenu && (
                 <>
                   <div className="md:flex shadow hover:shadow-xl transition-shadow duration-500 border bg-amber-400 border-indigo-600">
                     <div
@@ -168,9 +172,13 @@ export const Me = () => {
                   <div className=" mt-10   shadow  transition-shadow flex justify-around items-center">
                     <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
                       보유 포인트:{" "}
-                      <span className=" font-semibold ">
-                        {myWalletData?.myWallet.wallet?.point}
-                      </span>
+                      {myWalletData?.myWallet.wallet?.point ? (
+                        <span className=" font-semibold ">
+                          {myWalletData?.myWallet.wallet?.point}
+                        </span>
+                      ) : (
+                        <span>0</span>
+                      )}
                     </h1>
                     <button className="w-full md:text-2xl bg-teal-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none focus:ring-4 ring-teal-600 font-semibold text-gray-200 ">
                       포인트 충전하기
@@ -178,7 +186,7 @@ export const Me = () => {
                   </div>
                 </>
               )}
-              {selected === UserProfileMenus.BuyingHistoryMenu && (
+              {selected === MeMenus.BuyingHistoryMenu && (
                 <>
                   <div className="pt-10 pb-32 md:px-10 grid  md:grid-cols-3 gap-5  overflow-hidden">
                     {!myWalletLoading &&
@@ -190,7 +198,7 @@ export const Me = () => {
                   </div>
                 </>
               )}
-              {selected === UserProfileMenus.SellingHistoryMenu && (
+              {selected === MeMenus.SellingHistoryMenu && (
                 <>
                   <div className="bg-white pt-10 pb-20 px-10"></div>
                   <div className="flex overflow-hidden">

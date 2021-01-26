@@ -139,6 +139,12 @@ export const Product = () => {
     setFullSizeMode(true);
   };
 
+  const onClickToRevealAllName = (e: any) => {
+    if (data?.findProductById.product?.name) {
+      e.target.innerText = data?.findProductById.product?.name;
+    }
+  };
+
   useEffect(() => {
     if (!userLoading && userData?.me.user?.isVerified === false) {
       history.push("/not-valid-user");
@@ -156,6 +162,19 @@ export const Product = () => {
 
   if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (data?.findProductById.error) {
+    return (
+      <div className="w-full h-screen flex flex-col justify-center items-center">
+        <h1 className="text-amber-300 text-3xl font-bold">
+          {data?.findProductById.error}
+        </h1>
+        <Link className="mt-10 text-gray-200 hover:underline text-xl" to="/">
+          홈으로 돌아가기
+        </Link>
+      </div>
+    );
   }
 
   console.log(data);
@@ -180,26 +199,39 @@ export const Product = () => {
       {/* 메인 프레임  */}
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
         {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
-        <div className="flex items-center flex-col md:flex-row  pt-10 mx-5  shadow-xl ">
+        <div className=" grid grid-rows-2  md:grid-cols-2 md:grid-rows-1  pt-10 mx-5  shadow-xl ">
           {/* 프로덕트 사진 */}
-          <div className="  h-64 md:h-96  w-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900 overflow-hidden  ">
+          <div className=" w-full h-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900 overflow-hidden  ">
             <div
               onClick={onClickFullSizeImg}
               className="w-full h-full bg-cover bg-center transform hover:scale-110 transition-transform cursor-pointer z-0"
               style={{
-                transitionDuration: "0.6s",
                 backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
+                transitionDuration: "0.6s",
               }}
             ></div>
           </div>
           {/* 프로덕트 디테일 정보 */}
-          <div className="md:h-96  w-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
+          <div className=" w-full h-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
-                <span>
-                  {getNameSuppressed(data?.findProductById.product?.name)}
-                </span>
+                <div>
+                  {getNameSuppressed(
+                    data.findProductById.product.name
+                  ).includes("...") ? (
+                    <>
+                      <span
+                        onClick={onClickToRevealAllName}
+                        className="hover:underline"
+                      >
+                        {getNameSuppressed(data.findProductById.product.name)}
+                      </span>
+                    </>
+                  ) : (
+                    <span>{data.findProductById.product.name}</span>
+                  )}
+                </div>
               )}
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-b border-indigo-500 p-3">

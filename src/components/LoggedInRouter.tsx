@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
-  useHistory,
 } from "react-router-dom";
 import { useMe } from "../hooks/useMe";
 import { Home } from "../pages/Home";
@@ -37,14 +36,13 @@ const routes = [
     component: Me,
   },
   {
-    path: "/users/:id",
-    component: UserProfile,
-  },
-  {
     path: "/messages",
     component: Messages,
   },
-
+  {
+    path: "/users/:id",
+    component: UserProfile,
+  },
   {
     path: "/category/:slug",
     component: Home,
