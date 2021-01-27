@@ -39,6 +39,13 @@ export interface CreateProductInput {
   description?: string | null;
 }
 
+export interface EditProfileInput {
+  password?: string | null;
+  username?: string | null;
+  avatarImg?: string | null;
+  userId: number;
+}
+
 export interface FindUserByIdInput {
   userId: number;
 }

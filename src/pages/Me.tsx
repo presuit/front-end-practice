@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Menu } from "../components/Menu";
 import { useMe, useMyWallet } from "../hooks/useMe";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,8 @@ import {
   faUserCircle,
   faTimes,
   faPlus,
+  faUserTimes,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { WalletHistory } from "../components/WalletHistory";
 import { gql, useLazyQuery, useQuery, useReactiveVar } from "@apollo/client";
@@ -24,6 +26,7 @@ import {
   userSellingHistory,
   userSellingHistoryVariables,
 } from "../__generated__/userSellingHistory";
+import { useForm } from "react-hook-form";
 
 export enum MeMenus {
   UsernameMenu = "meUsernameMenu",
@@ -49,10 +52,15 @@ const USER_SELLING_HISTORY_QUERY = gql`
 `;
 
 export const Me = () => {
-  const { data, loading } = useMe();
+  const { data, loading, refetch: refetchMe } = useMe();
   const [
     sellingProductHistoryQuery,
-    { loading: sellingPHLoading, data: sellingPHData, called },
+    {
+      loading: sellingPHLoading,
+      data: sellingPHData,
+      called,
+      refetch: refetchSellingPH,
+    },
   ] = useLazyQuery<userSellingHistory, userSellingHistoryVariables>(
     USER_SELLING_HISTORY_QUERY
   );
@@ -110,21 +118,21 @@ export const Me = () => {
   }, [selected]);
 
   useEffect(() => {
+    console.log("data Effect!");
     if (data?.me.user?.isVerified === false) {
       history.push("/not-valid-user");
     }
   }, [data]);
 
   useEffect(() => {
-    if (data?.me.user) {
+    refetch();
+    refetchMe();
+    if (data?.me.user?.id) {
+      console.log("data Effect and user!");
       sellingProductHistoryQuery({
         variables: { input: { userId: data?.me.user?.id } },
       });
     }
-  }, [data?.me.user]);
-
-  useEffect(() => {
-    refetch();
   }, []);
 
   if (loading) {
@@ -185,26 +193,17 @@ export const Me = () => {
                         }}
                       ></div>
                     ) : (
-                      <form className="w-full bg-indigo-800 ">
-                        <label
-                          className="flex justify-center items-center cursor-pointer w-full py-20 md:py-32"
-                          htmlFor="userAvatar"
-                        >
+                      <div className="w-full bg-indigo-800 ">
+                        <div className="w-full py-20 md:py-32 flex items-center justify-center bg-indigo-800">
                           <FontAwesomeIcon
-                            icon={faPlus}
+                            icon={faUserTimes}
                             className="md:text-9xl text-6xl text-indigo-500"
                           />
-                        </label>
-                        <input
-                          id="userAvatar"
-                          className="w-0 h-0 absolute pointer-events-none"
-                          type="file"
-                          name="userAvatar"
-                        />
-                      </form>
+                        </div>
+                      </div>
                     )}
-                    <article className="w-full h-2/3 md:h-full grid grid-cols-3 grid-rows-1 bg-amber-400">
-                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
+                    <article className="w-full h-full grid grid-cols-3 grid-rows-1 bg-gray-200 ">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative ">
                         <span className="z-10 text-black">
                           {data.me.user.email}
                         </span>
@@ -213,7 +212,7 @@ export const Me = () => {
                           className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
                       </section>
-                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.isVerified
                             ? "인증 됨"
@@ -231,7 +230,7 @@ export const Me = () => {
                           />
                         )}
                       </section>
-                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.username}
                         </span>
@@ -242,7 +241,19 @@ export const Me = () => {
                       </section>
                     </article>
                   </div>
-                  <div className=" md:mt-10 shadow  transition-shadow flex justify-around items-center">
+                  {/* edit Profile button */}
+                  <div className="pt-3 flex justify-end items-center">
+                    {data.me.user && (
+                      <Link
+                        to={`/users/${data.me.user.id}/edit-profile`}
+                        className="md:text-xl text-base bg-indigo-600 py-5 px-3 text-gray-200 font-semibold rounded-xl"
+                      >
+                        프로필 수정하기
+                      </Link>
+                    )}
+                  </div>
+                  {/* point component */}
+                  <div className=" mt-5 shadow  transition-shadow flex justify-around items-center">
                     <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
                       <span className="text-gray-200">보유 포인트: </span>
                       {myWalletData?.myWallet.wallet?.point ? (

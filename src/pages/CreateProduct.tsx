@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
@@ -49,13 +49,13 @@ interface IFormProps {
 
 export const CreateProduct = () => {
   const descriptionDivRef = useRef<HTMLDivElement>(null);
-  let pointPercent = PointPercent.zeroDotOne;
   const [previewImage, setPreviewImage] = useState<string[]>([]);
   const [currentPreview, setCurrentPreview] = useState(0);
   const { data: userData, loading: userLoading } = useMe();
   const { data: categoriesData } = useQuery<allCategories>(
     ALL_CATEGORIES_QUERY
   );
+  const client = useApolloClient();
   const onCompleted = (data: createProduct) => {
     const {
       createProduct: { ok, error, productId },

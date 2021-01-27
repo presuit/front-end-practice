@@ -16,6 +16,7 @@ import { NotValidUser } from "../pages/NotValidUser";
 import { Product } from "../pages/Product";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { CreateProduct } from "../pages/CreateProduct";
+import { EditProfile } from "../pages/EditProfile";
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
   {
     path: "/users/:id",
     component: UserProfile,
+    exact: true,
+  },
+  {
+    path: "/users/:id/edit-profile",
+    component: EditProfile,
   },
   {
     path: "/category/:slug",

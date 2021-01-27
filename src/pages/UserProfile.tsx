@@ -93,17 +93,18 @@ export const UserProfile = () => {
   }, [selected]);
 
   useEffect(() => {
-    if (userData?.me.user?.isVerified === false) {
-      history.push("/not-valid-user");
-    }
     if (userData?.me.user && data?.findUserById.user) {
       if (userData?.me.user.id === data?.findUserById.user.id) {
         history.push("/me");
       }
     }
-    const selectedMenu = document.getElementById(UserProfileMenus.UsernameMenu);
-    console.log(`dasda ${selectedMenu}`);
-  }, []);
+  }, [userData, data]);
+
+  useEffect(() => {
+    if (userData?.me.user?.isVerified === false) {
+      history.push("/not-valid-user");
+    }
+  }, [userData]);
 
   if (userLoading) {
     <LoadingSpinner />;
@@ -166,7 +167,7 @@ export const UserProfile = () => {
                         />
                       </div>
                     )}
-                    <article className="w-full h-2/3 md:h-full grid grid-cols-2 grid-rows-1 bg-amber-400">
+                    <article className="w-full h-2/3 md:h-full grid grid-cols-2 grid-rows-1 bg-gray-200">
                       <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.findUserById.user.email}
