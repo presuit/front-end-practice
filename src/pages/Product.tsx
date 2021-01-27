@@ -14,6 +14,7 @@ import { joinRoom, joinRoomVariables } from "../__generated__/joinRoom";
 import { useMe } from "../hooks/useMe";
 import { PointPercent } from "../__generated__/globalTypes";
 import { FullSizeImgBoard } from "../components/FullSizeImgBoard";
+import { BackButton } from "../components/BackButton";
 
 interface IParams {
   id: string;
@@ -182,13 +183,7 @@ export const Product = () => {
   return (
     <div>
       {/* 뒤로 가기 버튼 */}
-      <div className="fixed top-0 left-0  ml-3 mt-5">
-        <FontAwesomeIcon
-          icon={faArrowLeft}
-          onClick={onClickToGoBack}
-          className="text-2xl 2xl:text-5xl text-amber-300 transition-colors cursor-pointer"
-        />
-      </div>
+      <BackButton />
       {data?.findProductById.product?.detailImgs && (
         <FullSizeImgBoard
           fullSizeMode={fullSizeMode}
@@ -201,7 +196,7 @@ export const Product = () => {
         {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
         <div className=" grid grid-rows-2  md:grid-cols-2 md:grid-rows-1  pt-10 mx-5  shadow-xl ">
           {/* 프로덕트 사진 */}
-          <div className=" w-full h-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-4 border-indigo-900 overflow-hidden  ">
+          <div className=" w-full h-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-8 border-indigo-900 overflow-hidden  ">
             <div
               onClick={onClickFullSizeImg}
               className="w-full h-full bg-cover bg-center transform hover:scale-110 transition-transform cursor-pointer z-0"
@@ -212,7 +207,7 @@ export const Product = () => {
             ></div>
           </div>
           {/* 프로덕트 디테일 정보 */}
-          <div className=" w-full h-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-4 border-indigo-900 md:border-l-0 border-t-0 md:border-t-4">
+          <div className=" w-full h-full bg-indigo-700 text-amber-300 grid grid-cols-2 md:rounded-r-2xl md:rounded-b-none rounded-b-2xl border-8 border-indigo-900 md:border-l-0 border-t-0 md:border-t-8">
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
@@ -295,8 +290,8 @@ export const Product = () => {
         </div>
 
         {/* 프로덕트 모인 금액과 참가하는 버튼이 존재하는 부분 */}
-        <div className="mt-10 mx-5 flex items-center justify-center  ">
-          <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-base md:text-xl text-gray-200 rounded-l-2xl   focus:outline-none w-1/2">
+        <div className="mt-10 mx-5 grid grid-cols-2  ">
+          <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-base md:text-xl text-gray-200 rounded-l-2xl   focus:outline-none w-full h-full flex justify-center items-center">
             {data?.findProductById.product?.soldout ? (
               <span>soldout!</span>
             ) : (
@@ -312,7 +307,7 @@ export const Product = () => {
               </>
             )}
           </div>
-          <div className="w-1/2">
+          <div className="w-full h-full flex justify-center items-center">
             {data?.findProductById.product?.room?.isMeInRoom ? (
               <button className="py-5 px-3 bg-teal-500 rounded-r-2xl focus:outline-none font-semibold text-base md:text-xl text-amber-300 transition-colors  cursor-not-allowed w-full ">
                 이미 참여하셨습니다.

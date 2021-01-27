@@ -43,21 +43,24 @@ export const CreateAccount = () => {
   };
   const onCompleted = (data: createAccount) => {
     const {
-      createAccount: { ok },
+      createAccount: { ok, error },
     } = data;
+
+    if (!ok && error) {
+      alert(error);
+    }
 
     if (ok) {
       alert("회원가입 성공! 로그인 해주세요");
       history.push("/");
     }
   };
-  const [createAccountMutation, { data }] = useMutation<
+  const [createAccountMutation, { error }] = useMutation<
     createAccount,
     createAccountVariables
   >(CREATE_ACCOUNT_MUTATION, {
     onCompleted,
   });
-  console.log(data);
 
   return (
     <div className=" min-h-screen  bg-indigo-500 flex items-center justify-center">
@@ -83,12 +86,12 @@ export const CreateAccount = () => {
             placeholder="이메일"
             required
           />
-          {errors.email?.types?.pattern && (
+          {errors.email?.type === "pattern" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               이메일 형식이 잘못되었습니다.
             </h4>
           )}
-          {errors.email?.message && (
+          {errors.email?.type === "required" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               {errors.email?.message}
             </h4>
@@ -103,7 +106,7 @@ export const CreateAccount = () => {
             placeholder="닉네임"
             required
           />
-          {errors.username?.message && (
+          {errors.username?.type === "required" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               {errors.username?.message}
             </h4>
@@ -118,7 +121,7 @@ export const CreateAccount = () => {
             placeholder="비밀번호"
             required
           />
-          {errors.password?.message && (
+          {errors.password?.type === "required" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               {errors.password?.message}
             </h4>
@@ -129,10 +132,8 @@ export const CreateAccount = () => {
           >
             회원가입
           </button>
-          {data?.createAccount.error && (
-            <h4 className="text-red-500 font-medium text-md my-3">
-              {data?.createAccount.error}
-            </h4>
+          {error && (
+            <h4 className="text-red-500 font-medium text-md my-3">{error}</h4>
           )}
         </form>
         <div>

@@ -8,10 +8,22 @@ import {
   faCheck,
   faUserCircle,
   faTimes,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { WalletHistory } from "../components/WalletHistory";
-import { useReactiveVar } from "@apollo/client";
+import { gql, useLazyQuery, useQuery, useReactiveVar } from "@apollo/client";
 import { currentMeMenu } from "../apollo";
+import { numberWithCommas } from "../utils";
+import { SellingHistory } from "../components/SellingHistory";
+import {
+  findUserById,
+  findUserByIdVariables,
+} from "../__generated__/findUserById";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import {
+  userSellingHistory,
+  userSellingHistoryVariables,
+} from "../__generated__/userSellingHistory";
 
 export enum MeMenus {
   UsernameMenu = "meUsernameMenu",
@@ -19,9 +31,36 @@ export enum MeMenus {
   SellingHistoryMenu = "meSellingHistoryMenu",
 }
 
+const USER_SELLING_HISTORY_QUERY = gql`
+  query userSellingHistory($input: FindUserByIdInput!) {
+    findUserById(input: $input) {
+      ok
+      error
+      user {
+        id
+        sellingProducts {
+          id
+          name
+          bigImg
+        }
+      }
+    }
+  }
+`;
+
 export const Me = () => {
   const { data, loading } = useMe();
-  const { data: myWalletData, loading: myWalletLoading } = useMyWallet();
+  const [
+    sellingProductHistoryQuery,
+    { loading: sellingPHLoading, data: sellingPHData, called },
+  ] = useLazyQuery<userSellingHistory, userSellingHistoryVariables>(
+    USER_SELLING_HISTORY_QUERY
+  );
+  const {
+    data: myWalletData,
+    loading: myWalletLoading,
+    refetch,
+  } = useMyWallet();
   const history = useHistory();
   const currentMenu = useReactiveVar(currentMeMenu);
   const [selected, setSelected] = useState<string>(currentMenu);
@@ -76,7 +115,21 @@ export const Me = () => {
     }
   }, [data]);
 
-  console.log(myWalletData);
+  useEffect(() => {
+    if (data?.me.user) {
+      sellingProductHistoryQuery({
+        variables: { input: { userId: data?.me.user?.id } },
+      });
+    }
+  }, [data?.me.user]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div>
@@ -123,15 +176,35 @@ export const Me = () => {
             <main className="p-5">
               {selected === MeMenus.UsernameMenu && (
                 <>
-                  <div className="md:flex shadow hover:shadow-xl transition-shadow duration-500 border bg-amber-400 border-indigo-600">
-                    <div
-                      className="py-32 w-full md:w-1/3 md:py-40 bg-cover bg-center "
-                      style={{
-                        backgroundImage: `url(${data.me.user.avatarImg})`,
-                      }}
-                    ></div>
-                    <div className=" md:w-2/3 grid grid-cols-3  w-full">
-                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
+                  <div className="grid grid-rows-2 md:grid-cols-2 md:grid-rows-1 w-full">
+                    {data.me.user.avatarImg ? (
+                      <div
+                        className="w-full py-32 bg-cover bg-center "
+                        style={{
+                          backgroundImage: `url(${data.me.user.avatarImg})`,
+                        }}
+                      ></div>
+                    ) : (
+                      <form className="w-full bg-indigo-800 ">
+                        <label
+                          className="flex justify-center items-center cursor-pointer w-full py-20 md:py-32"
+                          htmlFor="userAvatar"
+                        >
+                          <FontAwesomeIcon
+                            icon={faPlus}
+                            className="md:text-9xl text-6xl text-indigo-500"
+                          />
+                        </label>
+                        <input
+                          id="userAvatar"
+                          className="w-0 h-0 absolute pointer-events-none"
+                          type="file"
+                          name="userAvatar"
+                        />
+                      </form>
+                    )}
+                    <article className="w-full h-2/3 md:h-full grid grid-cols-3 grid-rows-1 bg-amber-400">
+                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.email}
                         </span>
@@ -139,8 +212,8 @@ export const Me = () => {
                           icon={faAt}
                           className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
-                      </h2>
-                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
+                      </section>
+                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.isVerified
                             ? "인증 됨"
@@ -157,8 +230,8 @@ export const Me = () => {
                             className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                           />
                         )}
-                      </h2>
-                      <h2 className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
+                      </section>
+                      <section className="py-10 md:py-0 w-full h-full md:text-base lg:text-xl 2xl:text-2xl text-xs font-semibold text-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.username}
                         </span>
@@ -166,15 +239,17 @@ export const Me = () => {
                           icon={faUserCircle}
                           className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
-                      </h2>
-                    </div>
+                      </section>
+                    </article>
                   </div>
-                  <div className=" mt-10   shadow  transition-shadow flex justify-around items-center">
+                  <div className=" md:mt-10 shadow  transition-shadow flex justify-around items-center">
                     <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
-                      보유 포인트:{" "}
+                      <span className="text-gray-200">보유 포인트: </span>
                       {myWalletData?.myWallet.wallet?.point ? (
                         <span className=" font-semibold ">
-                          {myWalletData?.myWallet.wallet?.point}
+                          {numberWithCommas(
+                            myWalletData?.myWallet.wallet?.point
+                          )}
                         </span>
                       ) : (
                         <span>0</span>
@@ -200,20 +275,23 @@ export const Me = () => {
               )}
               {selected === MeMenus.SellingHistoryMenu && (
                 <>
-                  <div className="bg-white pt-10 pb-20 px-10"></div>
-                  <div className="flex overflow-hidden">
-                    {Array.from({ length: 50 }, () => "a").map((_, index) => (
-                      <div
-                        key={index}
-                        className="w-0 h-0"
-                        style={{
-                          borderTop: "1rem solid white",
-                          borderLeft: "1rem solid transparent",
-                          borderRight: "1rem solid transparent",
-                        }}
-                      ></div>
-                    ))}
-                  </div>
+                  {sellingPHLoading && called ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <div className="p-5 grid md:grid-cols-3 gap-5">
+                      {sellingPHData?.findUserById.user?.sellingProducts &&
+                        sellingPHData?.findUserById.user?.sellingProducts.map(
+                          (eachProduct) => (
+                            <SellingHistory
+                              key={eachProduct.id}
+                              id={eachProduct.id}
+                              bigImg={eachProduct.bigImg}
+                              name={eachProduct.name}
+                            />
+                          )
+                        )}
+                    </div>
+                  )}
                 </>
               )}
             </main>

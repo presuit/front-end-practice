@@ -9,6 +9,13 @@ import { FindUserByIdInput } from "./globalTypes";
 // GraphQL query operation: findUserById
 // ====================================================
 
+export interface findUserById_findUserById_user_sellingProducts {
+  __typename: "Product";
+  id: number;
+  name: string;
+  bigImg: string | null;
+}
+
 export interface findUserById_findUserById_user {
   __typename: "User";
   id: number;
@@ -16,6 +23,7 @@ export interface findUserById_findUserById_user {
   isVerified: boolean;
   username: string;
   avatarImg: string | null;
+  sellingProducts: findUserById_findUserById_user_sellingProducts[] | null;
 }
 
 export interface findUserById_findUserById {

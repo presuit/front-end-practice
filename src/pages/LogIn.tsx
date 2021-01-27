@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { isLoggedIn } from "../apollo";
 import { Helmet } from "react-helmet-async";
 import { LogInInput } from "../__generated__/globalTypes";
+import { data } from "autoprefixer";
 
 const LOG_IN_MUTATION = gql`
   mutation logIn($input: LogInInput!) {
@@ -23,19 +24,22 @@ export const LogIn = () => {
   });
   const onCompleted = (data: logIn) => {
     const {
-      logIn: { ok, token },
+      logIn: { ok, token, error },
     } = data;
 
+    if (!ok && error) {
+      alert(error);
+    }
+
     if (ok && token) {
-      console.log(token);
+      alert("로그인 성공!");
       localStorage.setItem("token", token);
-      isLoggedIn(true);
       window.location.reload();
     }
   };
-  const onClick = () => {
+  const onClick = async () => {
     const { email, password } = getValues();
-    logInMutation({
+    await logInMutation({
       variables: {
         input: {
           email,
@@ -44,7 +48,7 @@ export const LogIn = () => {
       },
     });
   };
-  const [logInMutation, { data, error: mutationError }] = useMutation<
+  const [logInMutation, { error: mutationError }] = useMutation<
     logIn,
     logInVariables
   >(LOG_IN_MUTATION, {
@@ -74,7 +78,7 @@ export const LogIn = () => {
             placeholder="이메일"
             required
           />
-          {errors.email?.types?.pattern && (
+          {errors.email?.type === "pattern" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               이메일 형식이 잘못되었습니다.
             </h4>
@@ -94,7 +98,7 @@ export const LogIn = () => {
             placeholder="비밀번호"
             required
           />
-          {errors.password?.message && (
+          {errors.password?.type === "required" && (
             <h4 className="text-red-500 font-medium text-md my-3">
               {errors.password?.message}
             </h4>
@@ -105,9 +109,10 @@ export const LogIn = () => {
           >
             로그인
           </button>
+          {}
           {mutationError && (
             <h4 className="text-red-500 font-medium text-md my-3">
-              {mutationError.message}
+              {mutationError}
             </h4>
           )}
         </form>

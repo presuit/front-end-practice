@@ -61,14 +61,14 @@ export const ValidationCode = () => {
           <h1 className="text-white font-semibold text-2xl">Loading...</h1>
         )}
         {!loading && data?.confirmVerificationCode.error && (
-          <>
-            <h1 className="text-white font-semibold text-2xl">
+          <div className="px-5 py-10 flex flex-col justify-center items-center border mx-3 bg-white rounded-xl">
+            <h1 className="text-black font-semibold text-2xl">
               {data?.confirmVerificationCode.error}
             </h1>
-            <Link className="text-white mt-10" to="/">
+            <Link className="text-black mt-10 hover:underline" to="/">
               홈으로 가기
             </Link>
-          </>
+          </div>
         )}
       </div>
     </div>

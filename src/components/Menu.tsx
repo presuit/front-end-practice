@@ -221,7 +221,7 @@ export const Menu: React.FC<IHomeMenuProps> = ({
           <Link to="/product/new">
             <FontAwesomeIcon
               icon={faPlusCircle}
-              className="mr-2 md:mr-5 mb-7 2xl:mr-10 text-5xl text-indigo-800"
+              className="mr-2 md:mr-5 mb-7 2xl:mr-10 text-5xl text-indigo-800 transform hover:scale-125 transition-transform"
             />
           </Link>
         </div>

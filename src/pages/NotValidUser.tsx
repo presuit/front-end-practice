@@ -18,8 +18,8 @@ export const NotValidUser = () => {
   };
   const onClickToResetToken = () => {
     localStorage.removeItem("token");
-    isLoggedIn(false);
     history.push("/");
+    window.location.reload();
   };
   return (
     <div>
@@ -47,16 +47,18 @@ export const NotValidUser = () => {
                 {errors.code?.message}
               </h2>
             )}
-            <button className="mt-3 border px-5 py-2  font-medium text-md hover:bg-teal-600 hover:text-white transition-colors mr-5">
-              확인
-            </button>
-            <Link
-              onClick={onClickToResetToken}
-              className="mt-5 text-base"
-              to="/"
-            >
-              홈페이지로 돌아가기
-            </Link>
+            <div className="mt-10 grid grid-cols-2 w-full">
+              <Link
+                onClick={onClickToResetToken}
+                className=" text-base hover:bg-indigo-500  hover:text-white  border transition-colors flex justify-center items-center p-3"
+                to="/"
+              >
+                로그인 페이지로 돌아가기
+              </Link>
+              <button className=" border  font-medium text-md hover:bg-teal-600 hover:text-white transition-colors flex justify-center items-center p-3 focus:outline-none">
+                확인
+              </button>
+            </div>
           </form>
         </div>
       </div>
