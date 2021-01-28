@@ -7,11 +7,6 @@
 // GraphQL query operation: me
 // ====================================================
 
-export interface me_me_user_sellingProducts {
-  __typename: "Product";
-  id: number;
-}
-
 export interface me_me_user {
   __typename: "User";
   id: number;
@@ -19,7 +14,6 @@ export interface me_me_user {
   email: string;
   username: string;
   avatarImg: string | null;
-  sellingProducts: me_me_user_sellingProducts[] | null;
 }
 
 export interface me_me {

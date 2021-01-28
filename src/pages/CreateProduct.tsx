@@ -16,6 +16,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { PointPercent } from "../__generated__/globalTypes";
+import { FormError } from "../components/FormError";
+import { numberWithCommas } from "../utils";
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -50,17 +52,18 @@ interface IFormProps {
 export const CreateProduct = () => {
   const descriptionDivRef = useRef<HTMLDivElement>(null);
   const [previewImage, setPreviewImage] = useState<string[]>([]);
+  const [currentPrice, setCurrentPrice] = useState(0);
   const [currentPreview, setCurrentPreview] = useState(0);
   const { data: userData, loading: userLoading } = useMe();
   const { data: categoriesData } = useQuery<allCategories>(
     ALL_CATEGORIES_QUERY
   );
-  const client = useApolloClient();
   const onCompleted = (data: createProduct) => {
     const {
       createProduct: { ok, error, productId },
     } = data;
     if (ok) {
+      alert("상품 가격의 일원 단위는 지워집니다.");
       alert("프로덕트가 성공적으로 create 되었습니다.");
       history.push(`/product/${productId}`);
     } else {
@@ -73,7 +76,15 @@ export const CreateProduct = () => {
     createProductVariables
   >(CREATE_PRODUCT_MUTATION, { onCompleted });
   const history = useHistory();
-  const { register, getValues, handleSubmit, errors } = useForm<IFormProps>({
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    watch,
+    errors,
+    formState,
+    setValue,
+  } = useForm<IFormProps>({
     mode: "onChange",
   });
   useEffect(() => {
@@ -124,42 +135,49 @@ export const CreateProduct = () => {
       category,
       imageUploads,
       productName,
-      productPrice,
       pointPercentKor,
     } = getValues();
     const description = descriptionDivRef.current?.innerHTML;
     const pointPercent = parsePointPercentKorToEnum(pointPercentKor);
-    const formImgData = new FormData();
-    Object.values(imageUploads).forEach((eachImg) =>
-      formImgData.append("uploads", eachImg)
-    );
-    const {
-      data,
-    }: { data: { uploaded: boolean; url: string }[] } = await axios({
-      method: "POST",
-      url: "http://localhost:4000/uploads",
-      headers: { "Content-Type": "multipart/form-data" },
-      data: formImgData,
-    });
-    if (data) {
-      const bigImg: string = data[0].uploaded ? data[0].url : "";
-      const detailImgs: string[] = data.map((eachData) =>
-        eachData.uploaded ? eachData.url : ""
+    const price = Math.floor(currentPrice / 10) * 10;
+    let bigImg: string | null = null;
+    let detailImgs: string[] | null = null;
+
+    console.log("Submit!", imageUploads);
+
+    if (imageUploads && imageUploads.length !== 0) {
+      const formImgData = new FormData();
+      Object.values(imageUploads).forEach((eachImg) =>
+        formImgData.append("uploads", eachImg)
       );
-      await createProductMutation({
-        variables: {
-          input: {
-            categorySlug: category,
-            name: productName,
-            price: +productPrice,
-            description,
-            bigImg,
-            detailImgs,
-            pointPercent,
-          },
-        },
+      const {
+        data,
+      }: { data: { uploaded: boolean; url: string }[] } = await axios({
+        method: "POST",
+        url: "http://localhost:4000/uploads",
+        headers: { "Content-Type": "multipart/form-data" },
+        data: formImgData,
       });
+      if (data && data.length !== 0) {
+        bigImg = data[0].uploaded ? data[0].url : "";
+        detailImgs = data.map((eachData) =>
+          eachData.uploaded ? eachData.url : ""
+        );
+      }
     }
+    await createProductMutation({
+      variables: {
+        input: {
+          categorySlug: category,
+          name: productName,
+          price,
+          ...(description && { description }),
+          ...(bigImg && { bigImg }),
+          ...(detailImgs && { detailImgs }),
+          pointPercent,
+        },
+      },
+    });
   };
 
   const generatePointPercentOption = (value: PointPercent) => {
@@ -179,6 +197,22 @@ export const CreateProduct = () => {
       return "가격의 0.1%";
     }
   };
+
+  const validatePrice = () => {
+    let value = watch("productPrice");
+    if (value.includes(",")) {
+      value = value.replaceAll(",", "");
+    }
+    let number = Number.parseInt(value);
+    if (isNaN(number)) {
+      setValue("productPrice", value.substr(0, value.length - 1));
+    } else {
+      setValue("productPrice", numberWithCommas(number));
+      setCurrentPrice(number);
+    }
+  };
+
+  console.log(errors);
 
   return (
     <div>
@@ -252,29 +286,55 @@ export const CreateProduct = () => {
               }
             }}
           />
-          <div className="grid grid-cols-5 grid-rows-4 md:grid-rows-2 ">
+          <div className="grid grid-cols-5 grid-rows-4 md:grid-rows-2 bg-indigo-600 ">
             <div className="col-start-1 col-span-5 md:col-start-1 md:col-span-3">
               <input
-                ref={register}
+                ref={register({
+                  required: "이름은 필수적인 요소입니다.",
+                })}
                 type="text"
                 required
                 name="productName"
-                placeholder="상품 이름 (20자 이하로 작성해 주세요)"
+                placeholder="상품 이름 "
                 className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
               />
+              {errors.productName?.message && (
+                <FormError errorMsg={errors.productName?.message} />
+              )}
+              {errors.productName?.type === "maxLength" && (
+                <FormError errorMsg={"최대 길이는 20자입니다."} />
+              )}
             </div>
-            <div className="flex items-center bg-indigo-600 row-start-2 row-span-1 col-start-1 col-span-5 md:col-start-1 md:col-span-3 md:row-start-2 md:row-span-1">
-              <input
-                ref={register}
-                type="text"
-                required
-                name="productPrice"
-                placeholder="상품 가격"
-                className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
-              />
-              <span className=" text-sm md:text-xl text-amber-300 pr-5">
-                원
-              </span>
+            <div className=" bg-indigo-600 row-start-2 row-span-1 col-start-1 col-span-5 md:col-start-1 md:col-span-3 md:row-start-2 md:row-span-1">
+              <div className="flex items-center">
+                <input
+                  ref={register({
+                    minLength: {
+                      message: "상품 금액은 최소 10원부터입니다.",
+                      value: 2,
+                    },
+                    maxLength: {
+                      message: "상품 금액이 1억을 넘어갈 순 없습니다.",
+                      value: 10,
+                    },
+                    required: "가격은 필수적인 요소입니다.",
+                  })}
+                  onChange={validatePrice}
+                  type="text"
+                  required
+                  name="productPrice"
+                  maxLength={10}
+                  minLength={2}
+                  placeholder="상품 가격"
+                  className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
+                />
+                <span className=" text-sm md:text-xl text-amber-300 pr-5">
+                  원
+                </span>
+              </div>
+              {errors.productPrice?.message && (
+                <FormError errorMsg={errors.productPrice?.message} />
+              )}
             </div>
 
             <div className="col-span-full row-start-3 row-span-1 md:col-start-4 md:col-span-2 md:row-start-1 md:row-span-1">
@@ -307,7 +367,7 @@ export const CreateProduct = () => {
               </select>
             </div>
           </div>
-          <div className="mb-14 py-12 px-10 bg-indigo-800">
+          <div className=" py-12 px-10 bg-indigo-800">
             <div
               ref={descriptionDivRef}
               className="w-full rounded-lg px-5 py-5 focus:outline-none bg-indigo-100 text-black text-sm md:text-xl"
@@ -316,12 +376,21 @@ export const CreateProduct = () => {
             />
           </div>
           <div className="pb-10 flex justify-center items-center">
-            <button
-              type="submit"
-              className="py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500 rounded-full text-gray-200 focus:outline-none focus:ring-4 ring-teal-600"
-            >
-              완료
-            </button>
+            {formState.isValid ? (
+              <button
+                type="submit"
+                className="w-full py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500  text-gray-200 focus:outline-none focus:ring-4 ring-teal-600"
+              >
+                완료
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500  text-gray-200 focus:outline-none focus:ring-4 ring-teal-600 opacity-70 pointer-events-none"
+              >
+                ...
+              </button>
+            )}
           </div>
         </form>
       </div>

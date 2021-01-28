@@ -21,10 +21,10 @@ export const ProductGridItem: React.FC<IProps> = ({ bigImg, name, price }) => {
         ></div>
       </div>
       <div className="grid grid-cols-2 md:h-1/3 py-10  md:py-0 rounded-b-lg w-full bg-indigo-800 border-8 border-t-0 border-indigo-900">
-        <h1 className="text-amber-300 font-semibold  flex justify-center items-center text-xl md:text-base lg:text-xl xl:text-2xl px-3">
+        <h1 className="text-amber-300 font-semibold  flex justify-center items-center text-xl md:text-base lg:text-lg xl:text-xl 2xl:text-2xl px-3">
           {getNameSuppressed(name)}
         </h1>
-        <h1 className="flex justify-center items-center text-amber-300 font-semibold text-xl md:text-base lg:text-xl xl:text-2xl px-3">
+        <h1 className="flex justify-center items-center text-amber-300 font-semibold text-xl md:text-base lg:text-lg xl:text-xl 2xl:text-2xl px-3">
           {numberWithCommas(price)}원
         </h1>
       </div>

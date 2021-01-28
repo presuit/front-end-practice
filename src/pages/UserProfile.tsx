@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { currentUserProfileMenu } from "../apollo";
+import { AvatarFullsize } from "../components/avatarFullsize";
 import { BackButton } from "../components/BackButton";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { SellingHistory } from "../components/SellingHistory";
@@ -55,9 +56,10 @@ export const UserProfile = () => {
   const currentMenu = useReactiveVar(currentUserProfileMenu);
   const [selected, setSelected] = useState<string>(currentMenu);
   const { loading: userLoading, data: userData } = useMe();
+  const [fullsizeMode, setFullsizeMode] = useState(false);
   const { data, error } = useQuery<findUserById, findUserByIdVariables>(
     FIND_USER_BY_ID_QUERY,
-    { variables: { input: { userId: +id } } }
+    { variables: { input: { userId: +id } }, fetchPolicy: "network-only" }
   );
 
   const onClickMenu = (e: any) => {
@@ -83,6 +85,10 @@ export const UserProfile = () => {
         currentUserProfileMenu(UserProfileMenus.UsernameMenu);
       }
     }
+  };
+
+  const onClickToFullsize = () => {
+    setFullsizeMode(true);
   };
 
   useEffect(() => {
@@ -127,6 +133,13 @@ export const UserProfile = () => {
       <BackButton />
       {data?.findUserById.user && (
         <div>
+          {data.findUserById.user.avatarImg && fullsizeMode === true && (
+            <AvatarFullsize
+              avatarUrl={data.findUserById.user.avatarImg}
+              fullsizeMode={fullsizeMode}
+              setFullsizeMode={setFullsizeMode}
+            />
+          )}
           <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
             <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
               <div
@@ -153,12 +166,15 @@ export const UserProfile = () => {
                 <>
                   <div className="grid grid-rows-2 md:grid-cols-2 md:grid-rows-1 w-full transition-shadow duration-500   ">
                     {data.findUserById.user.avatarImg ? (
-                      <div
-                        className="w-full py-32 bg-cover bg-center "
-                        style={{
-                          backgroundImage: `url(${data.findUserById.user.avatarImg})`,
-                        }}
-                      ></div>
+                      <div className="overflow-hidden">
+                        <div
+                          onClick={onClickToFullsize}
+                          className="w-full py-32 bg-cover bg-center transform hover:scale-125 duration-500 "
+                          style={{
+                            backgroundImage: `url(${data.findUserById.user.avatarImg})`,
+                          }}
+                        ></div>
+                      </div>
                     ) : (
                       <div className="w-full py-20 md:py-32 flex items-center justify-center bg-indigo-800">
                         <FontAwesomeIcon

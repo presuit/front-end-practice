@@ -13,20 +13,16 @@ import {
   faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { WalletHistory } from "../components/WalletHistory";
-import { gql, useLazyQuery, useQuery, useReactiveVar } from "@apollo/client";
+import { gql, useLazyQuery, useReactiveVar } from "@apollo/client";
 import { currentMeMenu } from "../apollo";
 import { numberWithCommas } from "../utils";
 import { SellingHistory } from "../components/SellingHistory";
-import {
-  findUserById,
-  findUserByIdVariables,
-} from "../__generated__/findUserById";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import {
   userSellingHistory,
   userSellingHistoryVariables,
 } from "../__generated__/userSellingHistory";
-import { useForm } from "react-hook-form";
+import { AvatarFullsize } from "../components/avatarFullsize";
 
 export enum MeMenus {
   UsernameMenu = "meUsernameMenu",
@@ -52,26 +48,25 @@ const USER_SELLING_HISTORY_QUERY = gql`
 `;
 
 export const Me = () => {
+  const history = useHistory();
+  const currentMenu = useReactiveVar(currentMeMenu);
+  const [selected, setSelected] = useState<string>(currentMenu);
+  const [fullsizeMode, setFullsizeMode] = useState(false);
   const { data, loading, refetch: refetchMe } = useMe();
+
   const [
     sellingProductHistoryQuery,
-    {
-      loading: sellingPHLoading,
-      data: sellingPHData,
-      called,
-      refetch: refetchSellingPH,
-    },
+    { loading: sellingPHLoading, data: sellingPHData, called },
   ] = useLazyQuery<userSellingHistory, userSellingHistoryVariables>(
-    USER_SELLING_HISTORY_QUERY
+    USER_SELLING_HISTORY_QUERY,
+    { fetchPolicy: "network-only" }
   );
+
   const {
     data: myWalletData,
     loading: myWalletLoading,
     refetch,
   } = useMyWallet();
-  const history = useHistory();
-  const currentMenu = useReactiveVar(currentMeMenu);
-  const [selected, setSelected] = useState<string>(currentMenu);
 
   const onClickMenu = (e: any) => {
     let targetMenu = e.target;
@@ -110,6 +105,10 @@ export const Me = () => {
     window.location.reload();
   };
 
+  const onClickToFullsize = () => {
+    setFullsizeMode(true);
+  };
+
   useEffect(() => {
     const selectedMenu = document.getElementById(selected);
     if (selectedMenu) {
@@ -143,6 +142,13 @@ export const Me = () => {
     <div>
       {!loading && data?.me.user && (
         <>
+          {data.me.user.avatarImg && fullsizeMode === true && (
+            <AvatarFullsize
+              avatarUrl={data.me.user.avatarImg}
+              fullsizeMode={fullsizeMode}
+              setFullsizeMode={setFullsizeMode}
+            />
+          )}
           <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
             <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
               <div
@@ -184,14 +190,17 @@ export const Me = () => {
             <main className="p-5">
               {selected === MeMenus.UsernameMenu && (
                 <>
-                  <div className="grid grid-rows-2 md:grid-cols-2 md:grid-rows-1 w-full">
+                  <div className="flex flex-col items-center md:grid md:grid-cols-2 md:grid-rows-1 w-full shadow-xl">
                     {data.me.user.avatarImg ? (
-                      <div
-                        className="w-full py-32 bg-cover bg-center "
-                        style={{
-                          backgroundImage: `url(${data.me.user.avatarImg})`,
-                        }}
-                      ></div>
+                      <div className="w-full h-60 md:h-96  overflow-hidden">
+                        <div
+                          onClick={onClickToFullsize}
+                          className="w-full h-full  bg-cover bg-center cursor-pointer transform hover:scale-125 duration-500"
+                          style={{
+                            backgroundImage: `url(${data.me.user.avatarImg})`,
+                          }}
+                        ></div>
+                      </div>
                     ) : (
                       <div className="w-full bg-indigo-800 ">
                         <div className="w-full py-20 md:py-32 flex items-center justify-center bg-indigo-800">
@@ -202,9 +211,9 @@ export const Me = () => {
                         </div>
                       </div>
                     )}
-                    <article className="w-full h-full grid grid-cols-3 grid-rows-1 bg-gray-200 ">
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative ">
-                        <span className="z-10 text-black">
+                    <article className="w-full h-full grid grid-cols-3 grid-rows-1 bg-indigo-500 ">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative ">
+                        <span className="z-10 text-gray-200">
                           {data.me.user.email}
                         </span>
                         <FontAwesomeIcon
@@ -212,11 +221,13 @@ export const Me = () => {
                           className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
                       </section>
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
-                          {data.me.user.isVerified
-                            ? "인증 됨"
-                            : "인증되지 않음"}
+                          {data.me.user.isVerified ? (
+                            <span className="text-gray-200">인증 됨</span>
+                          ) : (
+                            <span className="text-gray-200">인증되지 않음</span>
+                          )}
                         </span>
                         {data.me.user.isVerified ? (
                           <FontAwesomeIcon
@@ -230,8 +241,8 @@ export const Me = () => {
                           />
                         )}
                       </section>
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-600 flex justify-center items-center relative">
-                        <span className="z-10 text-black">
+                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800 flex justify-center items-center relative">
+                        <span className="z-10 text-gray-200">
                           {data.me.user.username}
                         </span>
                         <FontAwesomeIcon
@@ -253,8 +264,8 @@ export const Me = () => {
                     )}
                   </div>
                   {/* point component */}
-                  <div className=" mt-5 shadow  transition-shadow flex justify-around items-center">
-                    <h1 className="w-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
+                  <div className=" mt-5  grid grid-cols-2 pb-32">
+                    <h1 className="w-full h-full md:text-2xl  text-center py-5 md:py-10 px-5 rounded-l-2xl bg-indigo-600 text-amber-300 ">
                       <span className="text-gray-200">보유 포인트: </span>
                       {myWalletData?.myWallet.wallet?.point ? (
                         <span className=" font-semibold ">
@@ -266,7 +277,7 @@ export const Me = () => {
                         <span>0</span>
                       )}
                     </h1>
-                    <button className="w-full md:text-2xl bg-teal-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none focus:ring-4 ring-teal-600 font-semibold text-gray-200 ">
+                    <button className="w-full h-full md:text-2xl bg-teal-500 py-5 md:py-10 px-5 rounded-r-2xl focus:outline-none focus:ring-4 ring-teal-600 font-semibold text-gray-200 ">
                       포인트 충전하기
                     </button>
                   </div>
@@ -289,7 +300,7 @@ export const Me = () => {
                   {sellingPHLoading && called ? (
                     <LoadingSpinner />
                   ) : (
-                    <div className="p-5 grid md:grid-cols-3 gap-5">
+                    <div className="p-5 grid md:grid-cols-3 gap-5 pb-32">
                       {sellingPHData?.findUserById.user?.sellingProducts &&
                         sellingPHData?.findUserById.user?.sellingProducts.map(
                           (eachProduct) => (

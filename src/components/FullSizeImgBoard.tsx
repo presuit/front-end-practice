@@ -29,12 +29,14 @@ export const FullSizeImgBoard: React.FC<IProps> = ({
     const prevImgPagination = document.getElementById(`imgPagination${_index}`);
     let nextImgPagination: HTMLElement | null;
 
-    if (imgIndex === 0) {
-      setImgIndex(detailImgs.length - 1);
-      _index = detailImgs.length - 1;
-    } else {
-      setImgIndex((prev) => prev - 1);
-      _index -= 1;
+    if (detailImgs) {
+      if (imgIndex === 0) {
+        setImgIndex(detailImgs.length - 1);
+        _index = detailImgs.length - 1;
+      } else {
+        setImgIndex((prev) => prev - 1);
+        _index -= 1;
+      }
     }
 
     nextImgPagination = document.getElementById(`imgPagination${_index}`);

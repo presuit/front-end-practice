@@ -7,8 +7,6 @@ import {
   findProductByIdVariables,
 } from "../__generated__/findProductById";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { getNameSuppressed, numberWithCommas } from "../utils";
 import { joinRoom, joinRoomVariables } from "../__generated__/joinRoom";
 import { useMe } from "../hooks/useMe";
@@ -132,12 +130,11 @@ export const Product = () => {
       });
     }
   };
-  const onClickToGoBack = () => {
-    history.goBack();
-  };
 
   const onClickFullSizeImg = () => {
-    setFullSizeMode(true);
+    if (data?.findProductById.product?.bigImg) {
+      setFullSizeMode(true);
+    }
   };
 
   const onClickToRevealAllName = (e: any) => {
@@ -179,7 +176,6 @@ export const Product = () => {
   }
 
   console.log(data);
-
   return (
     <div>
       {/* 뒤로 가기 버튼 */}
