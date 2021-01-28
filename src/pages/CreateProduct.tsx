@@ -29,7 +29,7 @@ const CREATE_PRODUCT_MUTATION = gql`
   }
 `;
 
-const ALL_CATEGORIES_QUERY = gql`
+export const ALL_CATEGORIES_QUERY = gql`
   query allCategories {
     allCategories {
       ok

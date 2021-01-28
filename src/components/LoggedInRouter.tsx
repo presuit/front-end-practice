@@ -17,6 +17,7 @@ import { Product } from "../pages/Product";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { CreateProduct } from "../pages/CreateProduct";
 import { EditProfile } from "../pages/EditProfile";
+import { EditProduct } from "../pages/EditProduct";
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
   {
     path: "/product/:id",
     component: Product,
+    exact: true,
+  },
+  {
+    path: "/product/:id/edit",
+    component: EditProduct,
   },
 ];
 

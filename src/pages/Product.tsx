@@ -18,7 +18,7 @@ interface IParams {
   id: string;
 }
 
-const FIND_PRODUCT_BY_ID_QUERY = gql`
+export const FIND_PRODUCT_BY_ID_QUERY = gql`
   query findProductById($productId: Float!) {
     findProductById(productId: $productId) {
       ok
@@ -180,13 +180,14 @@ export const Product = () => {
     <div>
       {/* 뒤로 가기 버튼 */}
       <BackButton />
-      {data?.findProductById.product?.detailImgs && (
-        <FullSizeImgBoard
-          fullSizeMode={fullSizeMode}
-          setFullSizeMode={setFullSizeMode}
-          detailImgs={data?.findProductById.product?.detailImgs}
-        />
-      )}
+      {data?.findProductById.product?.detailImgs &&
+        data?.findProductById.product?.detailImgs.length !== 0 && (
+          <FullSizeImgBoard
+            fullSizeMode={fullSizeMode}
+            setFullSizeMode={setFullSizeMode}
+            detailImgs={data?.findProductById.product?.detailImgs}
+          />
+        )}
       {/* 메인 프레임  */}
       <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
         {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
@@ -207,7 +208,7 @@ export const Product = () => {
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-b border-indigo-500 p-3 ">
               <span>📦</span>
               {data?.findProductById.product?.name && (
-                <div>
+                <div className="text-center">
                   {getNameSuppressed(
                     data.findProductById.product.name
                   ).includes("...") ? (
@@ -285,8 +286,24 @@ export const Product = () => {
           </div>
         </div>
 
+        {/* 프로덕트 수정 */}
+
+        {data?.findProductById.product?.seller.id &&
+          userData?.me.user?.id &&
+          data?.findProductById.product?.seller.id ===
+            userData?.me.user?.id && (
+            <div className="mt-5 flex justify-end items-center mx-5">
+              <Link
+                to={`/product/${id}/edit`}
+                className="bg-indigo-600 text-gray-200 py-5 px-10 rounded-xl font-semibold md:text-xl "
+              >
+                수정하기
+              </Link>
+            </div>
+          )}
+
         {/* 프로덕트 모인 금액과 참가하는 버튼이 존재하는 부분 */}
-        <div className="mt-10 mx-5 grid grid-cols-2  ">
+        <div className="mt-5 mx-5 grid grid-cols-2  ">
           <div className="py-5 px-3 bg-indigo-700 text-center font-semibold text-base md:text-xl text-gray-200 rounded-l-2xl   focus:outline-none w-full h-full flex justify-center items-center">
             {data?.findProductById.product?.soldout ? (
               <span>soldout!</span>
@@ -327,7 +344,7 @@ export const Product = () => {
           </div>
         </div>
         {/* 프로덕트 세부 설명 컴포넌트 */}
-        <div className="mt-10 mx-5 pb-10">
+        <div className="mt-10 mx-5 pb-20">
           <h1
             ref={descriptionContainer}
             className="bg-gray-200 py-16 px-5 rounded-2xl shadow-2xl md:text-xl"

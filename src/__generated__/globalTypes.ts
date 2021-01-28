@@ -39,6 +39,16 @@ export interface CreateProductInput {
   description?: string | null;
 }
 
+export interface EditProductInput {
+  name?: string | null;
+  description?: string | null;
+  bigImg?: string | null;
+  productId: number;
+  detailImgSrcs?: string[] | null;
+  categorySlug?: string | null;
+  pointPercent?: PointPercent | null;
+}
+
 export interface EditProfileInput {
   password?: string | null;
   username?: string | null;
