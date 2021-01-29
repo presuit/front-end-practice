@@ -46,7 +46,6 @@ export interface EditProductInput {
   productId: number;
   detailImgSrcs?: string[] | null;
   categorySlug?: string | null;
-  pointPercent?: PointPercent | null;
 }
 
 export interface EditProfileInput {

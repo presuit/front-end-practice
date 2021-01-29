@@ -16,6 +16,7 @@ import {
 } from "../__generated__/editProduct";
 import { EDIT_PRODUCT_PRODUCT_QUERY } from "../pages/EditProduct";
 import { FIND_PRODUCT_BY_ID_QUERY } from "../pages/Product";
+import { AvatarFullsize } from "./avatarFullsize";
 
 interface IProps {
   originalImgs: string[];
@@ -39,6 +40,8 @@ export const ImgGrid: React.FC<IProps> = ({
 }) => {
   const [imgGridMode, setImgGridMode] = useState<ImgGridMode>(ImgGridMode.plus);
   const [imgGrid, setImgGrid] = useState<string[]>([]);
+  const [fullsizeMode, setFullsizeMode] = useState(false);
+  const [currentFullImg, setCurrentFullImg] = useState("");
   const uploadRef = useRef<HTMLInputElement>(null);
 
   const onCompleted = (data: editProduct) => {
@@ -93,7 +96,6 @@ export const ImgGrid: React.FC<IProps> = ({
         } else {
           bigImg = updatedImgs[0];
         }
-        console.log(bigImg);
         await editProductMutation({
           variables: {
             input: {
@@ -122,22 +124,102 @@ export const ImgGrid: React.FC<IProps> = ({
     }
   };
 
-  const uploadImg = () => {
-    if (uploadRef.current) {
-      console.log(uploadRef.current.files);
+  const uploadImg = async () => {
+    if (uploadRef.current?.files) {
+      const fileList: FileList = uploadRef.current.files;
+      if (fileList && fileList.length !== 0) {
+        const formData = new FormData();
+        Object.values(fileList).forEach(async (eachFile) => {
+          formData.append("uploads", eachFile);
+        });
+        const {
+          data,
+        }: { data: { uploaded: boolean; url: string | null }[] } = await axios({
+          method: "POST",
+          url: "http://localhost:4000/uploads",
+          headers: { "Content-Type": "multipart/form-data" },
+          data: formData,
+        });
+        if (data && data.length !== 0) {
+          const urlContainer: string[] = [];
+          for (const item of data) {
+            if (item.uploaded && item.url) {
+              urlContainer.push(item.url);
+            } else {
+              console.log(`aws-s3 img upload error on ${item}`);
+            }
+          }
+          console.log(urlContainer);
+          if (urlContainer.length !== 0) {
+            const detailImgSrcs = [...imgGrid, ...urlContainer];
+            setImgGrid((prev) => [...prev, ...urlContainer]);
+            if (useFor === "EDIT" && productId) {
+              console.log("detailImgs", detailImgSrcs, imgGrid);
+              await editProductMutation({
+                variables: {
+                  input: {
+                    productId,
+                    detailImgSrcs,
+                    bigImg: detailImgSrcs[0],
+                  },
+                },
+                refetchQueries: [
+                  {
+                    query: EDIT_PRODUCT_PRODUCT_QUERY,
+                    variables: {
+                      productId: +productId,
+                    },
+                  },
+                  {
+                    query: FIND_PRODUCT_BY_ID_QUERY,
+                    variables: { productId: +productId },
+                  },
+                ],
+              });
+            }
+          }
+        }
+      }
     }
+  };
+
+  const onClickToFullSize = (e: any) => {
+    let section = e.target.parentNode;
+    if (section.tagName === "svg") {
+      section = section.parentNode.parentNode;
+    }
+    if (section.tagName === "DIV") {
+      section = section.parentNode;
+    }
+
+    const id = section.id.split("-")[1];
+    const img = imgGrid[+id];
+    setCurrentFullImg(img);
+    setFullsizeMode(true);
   };
 
   useEffect(() => {
     setImgGrid([...originalImgs]);
   }, []);
 
+  console.log(currentFullImg);
+
   return (
-    <div className="min-h-screen w-full bg-gray-800">
+    <div className="min-h-screen w-full bg-gray-800 z-50 ">
+      {fullsizeMode && (
+        <AvatarFullsize
+          avatarUrl={currentFullImg}
+          fullsizeMode={fullsizeMode}
+          setFullsizeMode={setFullsizeMode}
+        />
+      )}
       {/* grid mode changer */}
       <div className="fixed bottom-0 right-0 m-5 flex flex-col items-center justify-end">
         <FontAwesomeIcon
-          onClick={() => setExitImgGrid(true)}
+          onClick={() => {
+            setExitImgGrid(true);
+            setImgGridMode(ImgGridMode.plus);
+          }}
           icon={faCheck}
           className=" text-3xl text-teal-500 cursor-pointer "
         />
@@ -166,16 +248,20 @@ export const ImgGrid: React.FC<IProps> = ({
       </div>
 
       {/* grid */}
-      <main className="max-w-screen-xl min-h-screen  mr-20 2xl:mx-auto grid md:grid-cols-3 gap-5 p-5">
+      <main className="max-w-screen-xl min-h-screen  mr-20 2xl:mx-auto grid grid-rows-3 md:grid-cols-3 gap-5 p-5">
         {imgGrid &&
           imgGrid.length !== 0 &&
           imgGrid.map((eachImg, index) => (
             <section
               id={`ImgGridItem-${index}`}
               key={index}
-              className=" py-32 relative flex justify-center items-center bg-cover bg-center border-8 border-indigo-900 rounded-xl"
-              style={{ backgroundImage: `url(${eachImg})` }}
+              className=" relative rounded-xl  hover:shadow-2xl transition-shadow overflow-hidden"
             >
+              <div
+                onClick={onClickToFullSize}
+                className="py-32 bg-cover bg-center transform hover:scale-125 transition-transform duration-500 cursor-pointer"
+                style={{ backgroundImage: `url(${eachImg})` }}
+              ></div>
               {imgGridMode === ImgGridMode.delete && (
                 <div
                   onClick={onClickToDelete}

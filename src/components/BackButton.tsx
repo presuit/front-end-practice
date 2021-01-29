@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 export const BackButton: React.FC = () => {
   const history = useHistory();
   const onClickToGoBack = () => {
-    history.goBack();
+    history.push("/");
   };
   return (
     <div className="fixed top-0 left-0  ml-3 mt-5">
