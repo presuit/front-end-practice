@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
@@ -18,6 +18,9 @@ import axios from "axios";
 import { PointPercent } from "../__generated__/globalTypes";
 import { FormError } from "../components/FormError";
 import { numberWithCommas } from "../utils";
+import { FormButton } from "../components/FormButton";
+import { BackButton } from "../components/BackButton";
+import { ImgGrid } from "../components/ImgGrid";
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -42,7 +45,6 @@ export const ALL_CATEGORIES_QUERY = gql`
 `;
 
 interface IFormProps {
-  imageUploads: FileList;
   productName: string;
   productPrice: string;
   category: string;
@@ -51,9 +53,11 @@ interface IFormProps {
 
 export const CreateProduct = () => {
   const descriptionDivRef = useRef<HTMLDivElement>(null);
+  const [formCalled, setFormCalled] = useState(false);
   const [previewImage, setPreviewImage] = useState<string[]>([]);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [currentPreview, setCurrentPreview] = useState(0);
+  const [exitImgGrid, setExitImgGrid] = useState(true);
   const { data: userData, loading: userLoading } = useMe();
   const { data: categoriesData } = useQuery<allCategories>(
     ALL_CATEGORIES_QUERY
@@ -71,7 +75,7 @@ export const CreateProduct = () => {
       console.log(error);
     }
   };
-  const [createProductMutation] = useMutation<
+  const [createProductMutation, { called }] = useMutation<
     createProduct,
     createProductVariables
   >(CREATE_PRODUCT_MUTATION, { onCompleted });
@@ -87,15 +91,7 @@ export const CreateProduct = () => {
   } = useForm<IFormProps>({
     mode: "onChange",
   });
-  useEffect(() => {
-    if (!userLoading && userData?.me.user?.isVerified === false) {
-      history.push("/not-valid-user");
-    }
-  }, []);
 
-  const onClickToGoBack = () => {
-    history.push("/");
-  };
   const onClickPreviewImageLeft = () => {
     if (currentPreview === 0) {
       setCurrentPreview(previewImage.length - 1);
@@ -131,25 +127,23 @@ export const CreateProduct = () => {
     return PointPercent.zeroDotOne;
   };
   const onSubmit = async () => {
-    const {
-      category,
-      imageUploads,
-      productName,
-      pointPercentKor,
-    } = getValues();
+    setFormCalled(true);
+    const { category, productName, pointPercentKor } = getValues();
     const description = descriptionDivRef.current?.innerHTML;
     const pointPercent = parsePointPercentKorToEnum(pointPercentKor);
     const price = Math.floor(currentPrice / 10) * 10;
     let bigImg: string | null = null;
     let detailImgs: string[] | null = null;
 
-    console.log("Submit!", imageUploads);
+    console.log("onSubmit", previewImage);
 
-    if (imageUploads && imageUploads.length !== 0) {
+    if (previewImage && previewImage.length !== 0) {
       const formImgData = new FormData();
-      Object.values(imageUploads).forEach((eachImg) =>
-        formImgData.append("uploads", eachImg)
-      );
+      for (const eachPreviewImg of previewImage) {
+        const response = await fetch(eachPreviewImg);
+        const blob = await response.blob();
+        formImgData.append("uploads", blob);
+      }
       const {
         data,
       }: { data: { uploaded: boolean; url: string }[] } = await axios({
@@ -178,6 +172,7 @@ export const CreateProduct = () => {
         },
       },
     });
+    setFormCalled(false);
   };
 
   const generatePointPercentOption = (value: PointPercent) => {
@@ -212,18 +207,35 @@ export const CreateProduct = () => {
     }
   };
 
+  const onClickToSetImgGrid = () => {
+    setExitImgGrid(false);
+  };
+
+  useEffect(() => {
+    if (!userLoading && userData?.me.user?.isVerified === false) {
+      history.push("/not-valid-user");
+    }
+  }, []);
+
   console.log(errors);
 
   return (
     <div>
-      <div className="fixed top-0 left-0  ml-3 mt-5">
-        <FontAwesomeIcon
-          icon={faArrowLeft}
-          onClick={onClickToGoBack}
-          className="text-2xl 2xl:text-5xl text-amber-300 transition-colors cursor-pointer"
+      {!exitImgGrid && (
+        <ImgGrid
+          useFor="CREATE"
+          originalImgs={previewImage}
+          setOriginalImgs={setPreviewImage}
+          exitImgGrid={exitImgGrid}
+          setExitImgGrid={setExitImgGrid}
         />
-      </div>
-      <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl">
+      )}
+      {exitImgGrid && <BackButton />}
+      <div
+        className={`max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl ${
+          exitImgGrid ? "block" : "hidden"
+        }`}
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex">
             {previewImage && previewImage.length !== 0 && (
@@ -237,55 +249,22 @@ export const CreateProduct = () => {
                 />
               </div>
             )}
-            <label
-              htmlFor="imageUploads"
+            <div
+              onClick={onClickToSetImgGrid}
               className=" h-64 md:h-96 bg-indigo-800 w-full flex justify-center items-center cursor-pointer"
             >
-              {previewImage && previewImage.length !== 0 && (
-                <img
-                  src={previewImage[currentPreview]}
-                  className="max-h-full  max-w-full"
-                />
-              )}
               {previewImage && previewImage.length === 0 && (
                 <FontAwesomeIcon
                   icon={faPlus}
-                  className="text-5xl text-amber-400"
+                  className="text-5xl text-indigo-500"
                 />
               )}
-            </label>
-            {previewImage && previewImage.length !== 0 && (
-              <div
-                onClick={onClickPreviewImageRight}
-                className="px-3 md:px-5 cursor-pointer  flex items-center justify-center bg-indigo-900   "
-              >
-                <FontAwesomeIcon
-                  icon={faArrowRight}
-                  className="text-2xl md:text-4xl text-indigo-300   "
-                />
-              </div>
-            )}
+              {previewImage && previewImage.length !== 0 && (
+                <img src={previewImage[0]} className="max-w-full max-h-full" />
+              )}
+            </div>
           </div>
-          <input
-            ref={register}
-            className="absolute opacity-0 pointer-events-none"
-            type="file"
-            name="imageUploads"
-            id="imageUploads"
-            accept="image/*"
-            multiple={true}
-            onInput={() => {
-              if (previewImage.length !== 0) {
-                setPreviewImage([]);
-              }
-              const fileList: FileList = getValues("imageUploads");
-              const keys = Object.keys(fileList);
-              for (const key of keys) {
-                const url = URL.createObjectURL(fileList.item(+key));
-                setPreviewImage((prev) => [...prev, url]);
-              }
-            }}
-          />
+
           <div className="grid grid-cols-5 grid-rows-4 md:grid-rows-2 bg-indigo-600 ">
             <div className="col-start-1 col-span-5 md:col-start-1 md:col-span-3">
               <input
@@ -296,7 +275,7 @@ export const CreateProduct = () => {
                 required
                 name="productName"
                 placeholder="상품 이름 "
-                className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
+                className="w-full py-8 md:py-10 px-5 text-base md:text-xl focus:outline-none bg-indigo-600 text-white  "
               />
               {errors.productName?.message && (
                 <FormError errorMsg={errors.productName?.message} />
@@ -306,7 +285,7 @@ export const CreateProduct = () => {
               )}
             </div>
             <div className=" bg-indigo-600 row-start-2 row-span-1 col-start-1 col-span-5 md:col-start-1 md:col-span-3 md:row-start-2 md:row-span-1">
-              <div className="flex items-center">
+              <div className="flex items-center border-t border-indigo-500">
                 <input
                   ref={register({
                     minLength: {
@@ -326,7 +305,7 @@ export const CreateProduct = () => {
                   maxLength={10}
                   minLength={2}
                   placeholder="상품 가격"
-                  className="w-full py-8 md:py-10 px-5 text-xs md:text-xl focus:outline-none bg-indigo-600 text-white  "
+                  className="w-full py-8 md:py-10 px-5 text-base md:text-xl focus:outline-none  bg-indigo-600 text-white  "
                 />
                 <span className=" text-sm md:text-xl text-amber-300 pr-5">
                   원
@@ -375,22 +354,12 @@ export const CreateProduct = () => {
               style={{ minHeight: "500px" }}
             />
           </div>
-          <div className="pb-10 flex justify-center items-center">
-            {formState.isValid ? (
-              <button
-                type="submit"
-                className="w-full py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500  text-gray-200 focus:outline-none focus:ring-4 ring-teal-600"
-              >
-                완료
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="w-full py-5 px-10 md:px-20 text-base md:text-xl font-semibold bg-teal-500  text-gray-200 focus:outline-none focus:ring-4 ring-teal-600 opacity-70 pointer-events-none"
-              >
-                ...
-              </button>
-            )}
+          <div className="pb-10 pt-3 flex justify-end items-center">
+            <FormButton
+              btnText={"제출"}
+              isValid={formState.isValid}
+              loading={formCalled}
+            />
           </div>
         </form>
       </div>

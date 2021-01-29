@@ -25,7 +25,7 @@ export const FormButton: React.FC<IProps> = ({ loading, btnText, isValid }) => {
   ) : (
     <button
       type="submit"
-      className="py-5 px-10 bg-rose-500 rounded-xl pointer-events-none focus:outline-none"
+      className="py-5 px-10 md:px-20 bg-rose-500 rounded-xl pointer-events-none focus:outline-none"
     >
       <span className="md:text-xl text-gray-200 font-semibold">...</span>
     </button>

@@ -20,6 +20,7 @@ import { AvatarFullsize } from "./avatarFullsize";
 
 interface IProps {
   originalImgs: string[];
+  setOriginalImgs?: React.Dispatch<React.SetStateAction<string[]>>;
   exitImgGrid: boolean;
   setExitImgGrid: React.Dispatch<React.SetStateAction<boolean>>;
   useFor: "CREATE" | "EDIT";
@@ -37,6 +38,7 @@ export const ImgGrid: React.FC<IProps> = ({
   setExitImgGrid,
   useFor,
   productId,
+  setOriginalImgs,
 }) => {
   const [imgGridMode, setImgGridMode] = useState<ImgGridMode>(ImgGridMode.plus);
   const [imgGrid, setImgGrid] = useState<string[]>([]);
@@ -60,7 +62,7 @@ export const ImgGrid: React.FC<IProps> = ({
     { onCompleted }
   );
 
-  const onClickToDelete = async (e: any) => {
+  const onClickToDeleteOnUpdate = async (e: any) => {
     let section = e.target.parentNode;
     if (section.tagName === "svg") {
       section = section.parentNode.parentNode;
@@ -124,36 +126,38 @@ export const ImgGrid: React.FC<IProps> = ({
     }
   };
 
-  const uploadImg = async () => {
-    if (uploadRef.current?.files) {
-      const fileList: FileList = uploadRef.current.files;
-      if (fileList && fileList.length !== 0) {
-        const formData = new FormData();
-        Object.values(fileList).forEach(async (eachFile) => {
-          formData.append("uploads", eachFile);
-        });
-        const {
-          data,
-        }: { data: { uploaded: boolean; url: string | null }[] } = await axios({
-          method: "POST",
-          url: "http://localhost:4000/uploads",
-          headers: { "Content-Type": "multipart/form-data" },
-          data: formData,
-        });
-        if (data && data.length !== 0) {
-          const urlContainer: string[] = [];
-          for (const item of data) {
-            if (item.uploaded && item.url) {
-              urlContainer.push(item.url);
-            } else {
-              console.log(`aws-s3 img upload error on ${item}`);
+  const uploadImgUpdate = async () => {
+    if (useFor === "EDIT" && productId) {
+      if (uploadRef.current?.files) {
+        const fileList: FileList = uploadRef.current.files;
+        if (fileList && fileList.length !== 0) {
+          const formData = new FormData();
+          Object.values(fileList).forEach(async (eachFile) => {
+            formData.append("uploads", eachFile);
+          });
+          const {
+            data,
+          }: {
+            data: { uploaded: boolean; url: string | null }[];
+          } = await axios({
+            method: "POST",
+            url: "http://localhost:4000/uploads",
+            headers: { "Content-Type": "multipart/form-data" },
+            data: formData,
+          });
+          if (data && data.length !== 0) {
+            const urlContainer: string[] = [];
+            for (const item of data) {
+              if (item.uploaded && item.url) {
+                urlContainer.push(item.url);
+              } else {
+                console.log(`aws-s3 img upload error on ${item}`);
+              }
             }
-          }
-          console.log(urlContainer);
-          if (urlContainer.length !== 0) {
-            const detailImgSrcs = [...imgGrid, ...urlContainer];
-            setImgGrid((prev) => [...prev, ...urlContainer]);
-            if (useFor === "EDIT" && productId) {
+            console.log(urlContainer);
+            if (urlContainer.length !== 0) {
+              const detailImgSrcs = [...imgGrid, ...urlContainer];
+              setImgGrid((prev) => [...prev, ...urlContainer]);
               console.log("detailImgs", detailImgSrcs, imgGrid);
               await editProductMutation({
                 variables: {
@@ -180,6 +184,41 @@ export const ImgGrid: React.FC<IProps> = ({
           }
         }
       }
+    }
+  };
+
+  const uploadImgCreate = async () => {
+    if (useFor === "CREATE" && setOriginalImgs) {
+      if (uploadRef.current?.files) {
+        const fileList: FileList = uploadRef.current.files;
+        const urls = Object.values(fileList).map((eachFile) =>
+          URL.createObjectURL(eachFile)
+        );
+        console.log(urls);
+        if (urls.length !== 0) {
+          setImgGrid([...imgGrid, ...urls]);
+          setOriginalImgs([...originalImgs, ...urls]);
+        }
+      }
+    }
+  };
+
+  const onClickToDeleteOnCreate = (e: any) => {
+    if (useFor === "CREATE" && setOriginalImgs) {
+      let section = e.target.parentNode;
+      if (section.tagName === "svg") {
+        section = section.parentNode.parentNode;
+      }
+      if (section.tagName === "DIV") {
+        section = section.parentNode;
+      }
+      const sectionId = section.id.split("-")[1];
+      const sectionImg = imgGrid[+sectionId];
+      const updatedImgGrid = imgGrid.filter(
+        (eachImg) => eachImg !== sectionImg
+      );
+      setImgGrid([...updatedImgGrid]);
+      setOriginalImgs([...updatedImgGrid]);
     }
   };
 
@@ -237,7 +276,7 @@ export const ImgGrid: React.FC<IProps> = ({
         </label>
         <input
           ref={uploadRef}
-          onInput={uploadImg}
+          onInput={useFor === "EDIT" ? uploadImgUpdate : uploadImgCreate}
           type="file"
           id="imgUpload"
           name="imgUpload"
@@ -264,7 +303,11 @@ export const ImgGrid: React.FC<IProps> = ({
               ></div>
               {imgGridMode === ImgGridMode.delete && (
                 <div
-                  onClick={onClickToDelete}
+                  onClick={
+                    useFor === "EDIT"
+                      ? onClickToDeleteOnUpdate
+                      : onClickToDeleteOnCreate
+                  }
                   className="absolute top-0 left-0 w-full h-full flex justify-center items-center cursor-pointer"
                 >
                   <FontAwesomeIcon
