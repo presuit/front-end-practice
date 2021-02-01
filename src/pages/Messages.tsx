@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import { Menu } from "../components/Menu";
 import { useMe } from "../hooks/useMe";
 
 export const Messages = () => {
@@ -10,5 +11,11 @@ export const Messages = () => {
       history.push("/not-valid-user");
     }
   }, []);
-  return <div>물좀 가져옴</div>;
+  return (
+    <div>
+      <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
+        <Menu />
+      </div>
+    </div>
+  );
 };

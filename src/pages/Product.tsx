@@ -13,6 +13,9 @@ import { useMe } from "../hooks/useMe";
 import { PointPercent } from "../__generated__/globalTypes";
 import { FullSizeImgBoard } from "../components/FullSizeImgBoard";
 import { BackButton } from "../components/BackButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+import { isTryStatement } from "typescript";
 
 interface IParams {
   id: string;
@@ -56,6 +59,7 @@ const JOIN_ROOM_MUTATION = gql`
 export const Product = () => {
   const history = useHistory();
   const descriptionContainer = useRef<HTMLHeadingElement>(null);
+  const questionRef = useRef<HTMLDivElement>(null);
   const [fullSizeMode, setFullSizeMode] = useState<boolean>(false);
   const { id } = useParams<IParams>();
   const { data: userData, loading: userLoading } = useMe();
@@ -90,27 +94,30 @@ export const Product = () => {
     { onCompleted }
   );
 
-  const getRoomPrice = (value: PointPercent): number => {
-    let percent: number = 1;
+  const getRoomPrice = (value: PointPercent) => {
     if (data?.findProductById.product?.price) {
+      let percent: number;
       if (value === PointPercent.full) {
         percent = 1;
-      }
-      if (value === PointPercent.half) {
+      } else if (value === PointPercent.half) {
         percent = 0.5;
-      }
-      if (value === PointPercent.one) {
+      } else if (value === PointPercent.one) {
         percent = 0.01;
-      }
-      if (value === PointPercent.ten) {
+      } else if (value === PointPercent.ten) {
         percent = 0.1;
-      }
-      if (value === PointPercent.zeroDotOne) {
+      } else if (value === PointPercent.zeroDotOne) {
         percent = 0.001;
+      } else {
+        return NaN;
       }
-      return Math.ceil(data.findProductById.product.price * percent);
+      console.log(percent);
+      let calcedPrice = Math.ceil(data.findProductById.product.price * percent);
+      if (calcedPrice % 10 !== 0) {
+        calcedPrice = (Math.floor(calcedPrice / 10) + 1) * 10;
+      }
+      return calcedPrice;
     } else {
-      throw Error("room Price를 구하지 못했습니다.");
+      return NaN;
     }
   };
 
@@ -140,6 +147,20 @@ export const Product = () => {
   const onClickToRevealAllName = (e: any) => {
     if (data?.findProductById.product?.name) {
       e.target.innerText = data?.findProductById.product?.name;
+    }
+  };
+
+  const onClickToOpenQuestion = () => {
+    if (questionRef.current) {
+      questionRef.current.style.display = "block";
+      questionRef.current.style.opacity = "1";
+    }
+  };
+
+  const onClickToOpenQuestionClose = () => {
+    if (questionRef.current) {
+      questionRef.current.style.display = "hidden";
+      questionRef.current.style.opacity = "0";
     }
   };
 
@@ -236,13 +257,25 @@ export const Product = () => {
                 <span>가격이 정해지지 않았습니다.</span>
               )}
               {data?.findProductById.product?.pointPercent && (
-                <span className="text-xs md:text-base mt-3">
+                <div className="text-xs md:text-base mt-3 relative">
                   (응모당{" "}
                   {numberWithCommas(
                     getRoomPrice(data.findProductById.product.pointPercent)
                   )}
                   원)
-                </span>
+                  <FontAwesomeIcon
+                    onClick={onClickToOpenQuestion}
+                    className="ml-1 cursor-pointer text-indigo-300"
+                    icon={faQuestionCircle}
+                  />
+                  <div
+                    onClick={onClickToOpenQuestionClose}
+                    ref={questionRef}
+                    className="hidden absolute top-7  left-3/4 w-24 text-black text-xs  p-3 bg-indigo-300 rounded-xl font-semibold cursor-pointer transition-all"
+                  >
+                    응모당 가격의 일의자리는 올림하여 계산 됩니다.
+                  </div>
+                </div>
               )}
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3 border-b">

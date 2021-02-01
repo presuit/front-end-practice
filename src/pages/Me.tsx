@@ -117,7 +117,6 @@ export const Me = () => {
   }, [selected]);
 
   useEffect(() => {
-    console.log("data Effect!");
     if (data?.me.user?.isVerified === false) {
       history.push("/not-valid-user");
     }
@@ -127,7 +126,6 @@ export const Me = () => {
     refetch();
     refetchMe();
     if (data?.me.user?.id) {
-      console.log("data Effect and user!");
       sellingProductHistoryQuery({
         variables: { input: { userId: data?.me.user?.id } },
       });

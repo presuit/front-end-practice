@@ -154,7 +154,6 @@ export const ImgGrid: React.FC<IProps> = ({
                 console.log(`aws-s3 img upload error on ${item}`);
               }
             }
-            console.log(urlContainer);
             if (urlContainer.length !== 0) {
               const detailImgSrcs = [...imgGrid, ...urlContainer];
               setImgGrid((prev) => [...prev, ...urlContainer]);
@@ -180,6 +179,7 @@ export const ImgGrid: React.FC<IProps> = ({
                   },
                 ],
               });
+              uploadRef.current.value = "";
             }
           }
         }
@@ -198,6 +198,7 @@ export const ImgGrid: React.FC<IProps> = ({
         if (urls.length !== 0) {
           setImgGrid([...imgGrid, ...urls]);
           setOriginalImgs([...originalImgs, ...urls]);
+          uploadRef.current.value = "";
         }
       }
     }

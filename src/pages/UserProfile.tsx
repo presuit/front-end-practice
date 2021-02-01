@@ -1,14 +1,11 @@
 import { gql, useQuery, useReactiveVar } from "@apollo/client";
 import {
   faAt,
-  faCheck,
-  faPlus,
-  faTimes,
   faUserCircle,
   faUserTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { currentUserProfileMenu } from "../apollo";
 import { AvatarFullsize } from "../components/avatarFullsize";
@@ -53,9 +50,10 @@ export enum UserProfileMenus {
 export const UserProfile = () => {
   const history = useHistory();
   const { id } = useParams<IParams>();
+  const { loading: userLoading, data: userData } = useMe();
+  const menuRef = useRef<HTMLDivElement>(null);
   const currentMenu = useReactiveVar(currentUserProfileMenu);
   const [selected, setSelected] = useState<string>(currentMenu);
-  const { loading: userLoading, data: userData } = useMe();
   const [fullsizeMode, setFullsizeMode] = useState(false);
   const { data, error } = useQuery<findUserById, findUserByIdVariables>(
     FIND_USER_BY_ID_QUERY,
@@ -96,7 +94,7 @@ export const UserProfile = () => {
     if (selectedMenu) {
       selectedMenu.classList.add("bg-indigo-500", "text-amber-300");
     }
-  }, [selected]);
+  }, [data, selected]);
 
   useEffect(() => {
     if (userData?.me.user && data?.findUserById.user) {
@@ -127,7 +125,8 @@ export const UserProfile = () => {
     history.goBack();
   }
 
-  console.log(data);
+  console.log(menuRef);
+
   return (
     <div>
       <BackButton />
@@ -169,7 +168,7 @@ export const UserProfile = () => {
                       <div className="overflow-hidden">
                         <div
                           onClick={onClickToFullsize}
-                          className="w-full py-32 bg-cover bg-center transform hover:scale-125 duration-500 "
+                          className="w-full py-32 md:h-96 md:py-0 bg-cover bg-center transform hover:scale-125 duration-500 "
                           style={{
                             backgroundImage: `url(${data.findUserById.user.avatarImg})`,
                           }}
