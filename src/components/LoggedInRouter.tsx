@@ -18,6 +18,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import { CreateProduct } from "../pages/CreateProduct";
 import { EditProfile } from "../pages/EditProfile";
 import { EditProduct } from "../pages/EditProduct";
+import { MsgRoom } from "../pages/MsgRoom";
 
 const routes = [
   {
@@ -40,6 +41,11 @@ const routes = [
   {
     path: "/messages",
     component: Messages,
+    exact: true,
+  },
+  {
+    path: "/messages/:id",
+    component: MsgRoom,
   },
   {
     path: "/users/:id",

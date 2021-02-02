@@ -2,10 +2,18 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useHistory } from "react-router-dom";
 
-export const BackButton: React.FC = () => {
+interface IProps {
+  url?: string;
+}
+
+export const BackButton: React.FC<IProps> = ({ url }) => {
   const history = useHistory();
   const onClickToGoBack = () => {
-    history.push("/");
+    if (url) {
+      console.log(url);
+      return history.push(url);
+    }
+    return history.push("/");
   };
   return (
     <div className="fixed top-0 left-0  ml-3 mt-5">

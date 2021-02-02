@@ -29,6 +29,13 @@ export interface CreateAccountInput {
   username: string;
 }
 
+export interface CreateMsgInput {
+  msgText: string;
+  toId: number;
+  fromId: number;
+  msgRoomId: number;
+}
+
 export interface CreateProductInput {
   name: string;
   price: number;
@@ -53,6 +60,10 @@ export interface EditProfileInput {
   username?: string | null;
   avatarImg?: string | null;
   userId: number;
+}
+
+export interface FindMsgRoomByIdInput {
+  id: number;
 }
 
 export interface FindUserByIdInput {
