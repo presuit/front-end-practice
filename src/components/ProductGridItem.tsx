@@ -10,7 +10,7 @@ interface IProps {
 
 export const ProductGridItem: React.FC<IProps> = ({ bigImg, name, price }) => {
   return (
-    <div className="w-full h-full  shadow-xl ">
+    <div className="w-full h-full  shadow ">
       <div className=" md:w-full md:h-2/3  rounded-t-lg border-8 border-indigo-900 border-b-0 overflow-hidden">
         <div
           className=" bg-center bg-cover md:w-full md:h-full py-32 md:py-0 transform hover:scale-125 transition-transform"

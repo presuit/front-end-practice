@@ -115,7 +115,7 @@ export const EditProfile = () => {
   return (
     <div>
       <BackButton />
-      <div className="max-w-screen-lg  min-h-screen  mx-12 lg:mx-auto shadow-2xl ">
+      <div className="max-w-screen-lg  min-h-screen  lg:mx-auto ">
         <div>
           <label
             htmlFor="editProfileUserAvatar"

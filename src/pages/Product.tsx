@@ -210,7 +210,7 @@ export const Product = () => {
           />
         )}
       {/* 메인 프레임  */}
-      <div className="max-w-screen-2xl min-h-screen mx-12 2xl:mx-auto shadow-2xl bg-indigo-500">
+      <div className="max-w-screen-2xl min-h-screen  2xl:mx-auto  bg-indigo-500">
         {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
         <div className=" grid grid-rows-2  md:grid-cols-2 md:grid-rows-1  pt-10 mx-5  shadow-xl ">
           {/* 프로덕트 사진 */}
@@ -271,7 +271,7 @@ export const Product = () => {
                   <div
                     onClick={onClickToOpenQuestionClose}
                     ref={questionRef}
-                    className="hidden absolute top-7  left-3/4 w-24 text-black text-xs  p-3 bg-indigo-300 rounded-xl font-semibold cursor-pointer transition-all"
+                    className="hidden absolute top-7  left-1/2 w-24 text-black text-xs  p-3 bg-indigo-300 rounded-xl font-semibold cursor-pointer transition-all"
                   >
                     응모당 가격의 일의자리는 올림하여 계산 됩니다.
                   </div>

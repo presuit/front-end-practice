@@ -11,6 +11,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import "../styles/animation.css";
 import { currentHomePage } from "../apollo";
+import { NewMsg } from "./newMsg";
 
 interface IHomeMenuProps {
   totalPages?: number | null;
@@ -102,9 +103,10 @@ export const Menu: React.FC<IHomeMenuProps> = ({
           <>
             {menuOpen && (
               <Link to="/messages">
-                <FontAwesomeIcon
-                  icon={faCommentDots}
-                  className="text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                <NewMsg
+                  style={
+                    "text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                  }
                 />
               </Link>
             )}
@@ -151,9 +153,10 @@ export const Menu: React.FC<IHomeMenuProps> = ({
           <>
             {menuOpen && (
               <Link to="/messages">
-                <FontAwesomeIcon
-                  icon={faCommentDots}
-                  className="text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                <NewMsg
+                  style={
+                    "text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                  }
                 />
               </Link>
             )}
@@ -192,17 +195,19 @@ export const Menu: React.FC<IHomeMenuProps> = ({
               </Link>
             )}
             {menuOpen && (
-              <FontAwesomeIcon
-                icon={faCommentDots}
+              <NewMsg
                 onClick={triggerMenu}
-                className="text-3xl text-indigo-400 cursor-pointer md:text-4xl slowToShow"
+                style={
+                  "text-3xl text-indigo-400 cursor-pointer md:text-4xl slowToShow"
+                }
               />
             )}
             {!menuOpen && (
-              <FontAwesomeIcon
-                icon={faCommentDots}
+              <NewMsg
                 onClick={triggerMenu}
-                className="text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                style={
+                  "text-3xl text-gray-100 cursor-pointer md:text-4xl slowToShow"
+                }
               />
             )}
             {menuOpen && (

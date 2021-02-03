@@ -20,3 +20,27 @@ export const PRODUCTS_FRAGMENT = gql`
     }
   }
 `;
+
+export const MSG_ROOM_FRAGMENT = gql`
+  fragment msgRoomParts on MsgRoom {
+    id
+    msgs {
+      id
+      msgText
+      fromId
+      toId
+    }
+    participants {
+      id
+      username
+      email
+      avatarImg
+    }
+    product {
+      id
+      name
+      price
+      bigImg
+    }
+  }
+`;

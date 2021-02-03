@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useMe } from "../hooks/useMe";
 interface IProps {
   fromUser: any;
@@ -13,7 +14,7 @@ enum MsgType {
 }
 
 export const MsgBlock: React.FC<IProps> = ({ fromUser, msgText, toUser }) => {
-  const { loading: userLoading, data: userData } = useMe();
+  const { data: userData } = useMe();
   const [msgType, setMsgType] = useState<MsgType | null>(null);
   useEffect(() => {
     if (userData?.me.user) {
@@ -32,11 +33,22 @@ export const MsgBlock: React.FC<IProps> = ({ fromUser, msgText, toUser }) => {
         msgType === MsgType.SEND ? "self-end" : "self-start"
       }`}
     >
-      <img
-        className="w-14 h-14 border-4 rounded-full mr-5"
-        src={fromUser.avatarImg}
-      />
-      <div className="p-5 bg-gray-200 rounded-xl">{msgText}</div>
+      {msgType === MsgType.RECEIVE && (
+        <Link to={`/users/${fromUser.id}`}>
+          <img
+            style={{ minWidth: "3.5rem" }}
+            className="w-14 h-14 border-4 rounded-full mr-5 border-gray-200"
+            src={fromUser.avatarImg}
+          />
+        </Link>
+      )}
+      <div
+        className={`p-5  rounded-xl max-w-xs ${
+          msgType === MsgType.SEND ? "bg-amber-300 " : "bg-gray-200"
+        }`}
+      >
+        {msgText}
+      </div>
     </div>
   );
 };

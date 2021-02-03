@@ -147,8 +147,8 @@ export const Me = () => {
               setFullsizeMode={setFullsizeMode}
             />
           )}
-          <div className="max-w-screen-2xl  min-h-screen  mx-12 2xl:mx-auto shadow-2xl">
-            <header className="flex w-full items-center justify-between shadow-2xl bg-amber-300">
+          <div className="max-w-screen-2xl  min-h-screen  2xl:mx-auto">
+            <header className="flex w-full items-stretch justify-between shadow-2xl bg-amber-300">
               <div
                 id={MeMenus.UsernameMenu}
                 onClick={onClickMenu}
