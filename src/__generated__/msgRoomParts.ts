@@ -13,6 +13,7 @@ export interface msgRoomParts_msgs {
   msgText: string;
   fromId: number;
   toId: number;
+  createdAt: any;
 }
 
 export interface msgRoomParts_participants {

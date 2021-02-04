@@ -11,12 +11,19 @@ import { UserProfileMenus } from "./pages/UserProfile";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
+export interface newMsgManagerProps {
+  id: number;
+  lastSaw?: Date;
+  newMsg?: number;
+}
+
 const token = localStorage.getItem("token");
 export const isLoggedIn = makeVar(Boolean(token));
 export const authToken = makeVar(token);
 export const currentHomePage = makeVar(1);
 export const currentMeMenu = makeVar(MeMenus.UsernameMenu);
 export const currentUserProfileMenu = makeVar(UserProfileMenus.UsernameMenu);
+export const newMsgManager = makeVar<newMsgManagerProps[]>([]);
 
 const httpLink = createHttpLink({ uri: "http://localhost:4000/graphql" });
 

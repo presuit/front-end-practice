@@ -13,6 +13,7 @@ export interface receiveMsgRoom_receiveMsgRoom_msgs {
   msgText: string;
   fromId: number;
   toId: number;
+  createdAt: any;
 }
 
 export interface receiveMsgRoom_receiveMsgRoom_participants {

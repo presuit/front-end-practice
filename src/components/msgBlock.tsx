@@ -26,7 +26,6 @@ export const MsgBlock: React.FC<IProps> = ({ fromUser, msgText, toUser }) => {
       }
     }
   }, [userData]);
-  console.log(msgType);
   return (
     <div
       className={`flex my-5 mx-5 ${

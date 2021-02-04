@@ -15,6 +15,7 @@ export interface findMsgRoomById_findMsgRoomById_msgRoom_msgs {
   msgText: string;
   fromId: number;
   toId: number;
+  createdAt: any;
 }
 
 export interface findMsgRoomById_findMsgRoomById_msgRoom_participants {

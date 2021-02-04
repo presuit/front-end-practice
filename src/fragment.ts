@@ -29,6 +29,7 @@ export const MSG_ROOM_FRAGMENT = gql`
       msgText
       fromId
       toId
+      createdAt
     }
     participants {
       id

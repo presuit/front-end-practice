@@ -11,6 +11,7 @@ export interface receiveMsgCount_receiveMsgCount {
   __typename: "ReceiveMsgCountOutput";
   id: number;
   msgCounts: number;
+  createdAt: any;
 }
 
 export interface receiveMsgCount {

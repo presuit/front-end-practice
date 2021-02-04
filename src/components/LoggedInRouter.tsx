@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -19,6 +19,10 @@ import { CreateProduct } from "../pages/CreateProduct";
 import { EditProfile } from "../pages/EditProfile";
 import { EditProduct } from "../pages/EditProduct";
 import { MsgRoom } from "../pages/MsgRoom";
+import { useReactiveVar, useSubscription } from "@apollo/client";
+import { RECEIVE_MSG_COUNT } from "../pages/Messages";
+import { receiveMsgCount } from "../__generated__/receiveMsgCount";
+import { newMsgManager, newMsgManagerProps } from "../apollo";
 
 const routes = [
   {
@@ -77,6 +81,11 @@ const routes = [
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
+  const {
+    loading: receiveMsgCountLoading,
+    data: receiveMsgCountData,
+  } = useSubscription<receiveMsgCount>(RECEIVE_MSG_COUNT);
+  const _newMsgManager = useReactiveVar(newMsgManager);
   const onClickToRestart = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -85,6 +94,58 @@ export const LoggedInRouter = () => {
     window.location.href = "/";
     window.location.reload();
   };
+
+  useEffect(() => {
+    if (receiveMsgCountData?.receiveMsgCount) {
+      const {
+        receiveMsgCount: { id: msgRoomId, createdAt },
+      } = receiveMsgCountData;
+
+      if (
+        window.location.href === `http://localhost:3000/messages/${msgRoomId}`
+      ) {
+        return;
+      }
+
+      if (_newMsgManager.length === 0) {
+        const data: newMsgManagerProps = {
+          id: msgRoomId,
+          newMsg: 1,
+        };
+        newMsgManager([data]);
+        return;
+      }
+
+      const findOne = _newMsgManager.find((each) => each.id === msgRoomId);
+      const filtered = _newMsgManager.filter((each) => each.id !== msgRoomId);
+
+      if (findOne) {
+        if (findOne?.lastSaw) {
+          if (findOne.lastSaw.getTime() < new Date(createdAt).getTime()) {
+            newMsgManager([
+              ...filtered,
+              { ...findOne, newMsg: findOne?.newMsg ? findOne.newMsg + 1 : 1 },
+            ]);
+            return;
+          }
+        } else {
+          newMsgManager([
+            ...filtered,
+            { ...findOne, newMsg: findOne?.newMsg ? findOne.newMsg + 1 : 1 },
+          ]);
+          return;
+        }
+      } else {
+        const data: newMsgManagerProps = {
+          id: msgRoomId,
+          newMsg: 1,
+        };
+        newMsgManager([...filtered, data]);
+      }
+    }
+  }, [receiveMsgCountData]);
+
+  console.log("receiveMsgCountData", receiveMsgCountData, _newMsgManager);
 
   if (loading) {
     return <LoadingSpinner />;

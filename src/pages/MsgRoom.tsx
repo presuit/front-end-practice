@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { newMsgManager } from "../apollo";
 import { BackButton } from "../components/BackButton";
 import { MsgBlock } from "../components/msgBlock";
 import { MSG_ROOM_FRAGMENT } from "../fragment";
@@ -57,6 +58,7 @@ interface IFormProps {
 export const MsgRoom = () => {
   const { id } = useParams<IParams>();
   const { data: userData } = useMe();
+  const _newMsgManager = useReactiveVar(newMsgManager);
 
   const { register, getValues, handleSubmit, setValue } = useForm<IFormProps>();
 
@@ -138,10 +140,22 @@ export const MsgRoom = () => {
   }, [msgRoomData]);
 
   useEffect(() => {
-    (async () => {
-      await refetchMsgRoom({ input: { id: +id } });
+    (() => {
+      return refetchMsgRoom({ input: { id: +id } });
     })();
+    const findOne = _newMsgManager.find((each) => each.id === +id);
+    const filtered = _newMsgManager.filter((each) => each.id !== +id);
+    if (findOne) {
+      newMsgManager([
+        ...filtered,
+        { ...findOne, lastSaw: new Date(), newMsg: 0 },
+      ]);
+    } else {
+      newMsgManager([...filtered, { id: +id, lastSaw: new Date(), newMsg: 0 }]);
+    }
   }, []);
+
+  console.log(msgRoomData?.findMsgRoomById.msgRoom?.msgs);
 
   return (
     <div className="max-w-screen-2xl min-h-screen 2xl:mx-auto ">
