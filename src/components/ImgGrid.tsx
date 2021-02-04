@@ -78,7 +78,6 @@ export const ImgGrid: React.FC<IProps> = ({
       bucket: BUCKET_NAME,
       key,
     };
-    console.log(key);
     const {
       data: axiosData,
     }: { data: { deleted: boolean; error?: string } } = await axios({
@@ -213,6 +212,7 @@ export const ImgGrid: React.FC<IProps> = ({
       if (section.tagName === "DIV") {
         section = section.parentNode;
       }
+
       const sectionId = section.id.split("-")[1];
       const sectionImg = imgGrid[+sectionId];
       const updatedImgGrid = imgGrid.filter(

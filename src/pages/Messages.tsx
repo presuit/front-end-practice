@@ -44,25 +44,16 @@ interface IStateProps {
 export const Messages = () => {
   const history = useHistory();
   const _newMsgManager = useReactiveVar(newMsgManager);
-  const [currentMsgCounts, setCurrentMsgCounts] = useState<IStateProps[]>([]);
   const { loading: userLoading, data: userData } = useMe();
   const { data, refetch } = useQuery<allMsgRooms>(ALL_MSG_ROOMS_QUERY);
-  const {
-    loading: msgCountLoading,
-    data: msgCountData,
-  } = useSubscription<receiveMsgCount>(RECEIVE_MSG_COUNT);
 
-  useEffect(() => {
-    if (!msgCountLoading && msgCountData?.receiveMsgCount) {
-      setCurrentMsgCounts((prev) => {
-        const existed = prev.filter(
-          (eachPrev) => eachPrev.id !== msgCountData.receiveMsgCount.id
-        );
-        existed.push({ ...msgCountData.receiveMsgCount });
-        return [...existed];
-      });
+  const getNewMsgCount = (msgRoomId: number) => {
+    const findOne = _newMsgManager.find((each) => each.id === msgRoomId);
+    if (findOne) {
+      return findOne.newMsg || 0;
     }
-  }, [msgCountData]);
+    return 0;
+  };
 
   useEffect(() => {
     if (!userLoading && userData?.me.user?.isVerified === false) {
@@ -71,23 +62,8 @@ export const Messages = () => {
   }, [userData]);
 
   useEffect(() => {
-    if (data?.allMsgRooms?.ok && data?.allMsgRooms?.msgRooms) {
-      for (const item of data.allMsgRooms.msgRooms) {
-        const data: IStateProps = { id: item.id, msgCounts: item.msgCounts };
-        setCurrentMsgCounts((prev) => {
-          const existed = prev.filter((eachPrev) => eachPrev.id !== data.id);
-          existed.push({ ...data });
-          return [...existed];
-        });
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
     refetch();
   }, []);
-
-  console.log(_newMsgManager, msgCountData?.receiveMsgCount);
 
   return (
     <div>
@@ -101,10 +77,7 @@ export const Messages = () => {
                 msgRoomId={eachMsgRoom.id}
                 productName={eachMsgRoom.product.name}
                 productBigImg={eachMsgRoom.product.bigImg}
-                msgCounts={
-                  currentMsgCounts.find((each) => each.id === eachMsgRoom.id)
-                    ?.msgCounts || 0
-                }
+                msgCounts={getNewMsgCount(eachMsgRoom.id)}
               />
             ))}
         </main>

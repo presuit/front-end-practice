@@ -94,7 +94,7 @@ export const Menu: React.FC<IHomeMenuProps> = ({
     triggerMenu();
   }, [location]);
   return (
-    <div className=" flex justify-center items-center max-w-screen-md  mx-16 md:mx-auto fixed bottom-0 left-0 right-0  ">
+    <div className=" flex justify-center items-center max-w-screen-md  mx-10 md:mx-auto fixed bottom-0 left-0 right-0  ">
       <div
         ref={menuDiv}
         className="md:px-12 px-10 py-5 my-5   flex items-center justify-around  shadow-2xl bg-amber-300  rounded-full  "

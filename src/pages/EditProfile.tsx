@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router-dom";
 import { BackButton } from "../components/BackButton";
+import { BUCKET_NAME } from "../constants";
 import { useMe } from "../hooks/useMe";
 import {
   editProfile,
@@ -33,7 +34,7 @@ const EDIT_USER_PROFILE = gql`
 `;
 
 export const EditProfile = () => {
-  const { data: userData, loading: userLoading } = useMe();
+  const { data: userData } = useMe();
   const { register, getValues, setValue } = useForm<IFormParams>();
   const { id } = useParams<IParams>();
   const history = useHistory();
@@ -71,7 +72,30 @@ export const EditProfile = () => {
   const onClickToSave = async () => {
     const { editProfileUserAvatar, password, username } = getValues();
     let fileUrl: string = "";
+
     if (editProfileUserAvatar && editProfileUserAvatar.length !== 0) {
+      // if previous avatar img exists then delete it from aws_s3 and update
+      if (userData?.me?.user?.avatarImg) {
+        const key = userData.me.user.avatarImg.split("/")[3];
+        console.log("key", key);
+        const data: { bucket: string; key: string } = {
+          bucket: BUCKET_NAME,
+          key,
+        };
+
+        const {
+          data: axiosData,
+        }: { data: { deleted: boolean; error?: string } } = await axios({
+          method: "DELETE",
+          url: "http://localhost:4000/uploads",
+          data,
+        });
+        if (!axiosData.deleted) {
+          console.log(axiosData.error);
+          throw Error("axios delete method not fulfilled");
+        }
+      }
+
       const formImgData = new FormData();
       Object.values(editProfileUserAvatar).forEach((eachImg) =>
         formImgData.append("uploads", eachImg)
@@ -88,7 +112,7 @@ export const EditProfile = () => {
         fileUrl = data[0].url;
       }
     }
-    console.log(editProfileUserAvatar, password, username, fileUrl);
+
     await editProfileMutation({
       variables: {
         input: {

@@ -6,7 +6,6 @@ import { useMe } from "../hooks/useMe";
 import { allCategories } from "../__generated__/allCategories";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
 import { PointPercent } from "../__generated__/globalTypes";
 import { FormError } from "../components/FormError";
 import { numberWithCommas } from "../utils";

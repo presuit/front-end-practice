@@ -24,11 +24,13 @@ export const NewMsg: React.FC<IProps> = ({ onClick, style }) => {
   return (
     <div onClick={onClick} className="relative">
       <FontAwesomeIcon icon={faCommentDots} className={style} />
-      {_newMsgManager && _newMsgManager.length !== 0 && (
-        <span className="absolute -top-2 -right-6 text-xs font-semibold bg-indigo-500 text-amber-300  w-7 h-7 flex justify-center items-center rounded-full ">
-          {getAllNewMsg()}
-        </span>
-      )}
+      {_newMsgManager &&
+        _newMsgManager.length !== 0 &&
+        getAllNewMsg() !== 0 && (
+          <span className="absolute -top-2 -right-6 text-xs font-semibold bg-indigo-500 text-amber-300  w-7 h-7 flex justify-center items-center rounded-full ">
+            {getAllNewMsg()}
+          </span>
+        )}
     </div>
   );
 };

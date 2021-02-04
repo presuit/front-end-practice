@@ -1,6 +1,8 @@
+import { useReactiveVar } from "@apollo/client";
 import { faCommentAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import { newMsgManager } from "../apollo";
 import { getNameSuppressed } from "../utils";
 
 interface IProps {
@@ -16,6 +18,16 @@ export const MsgRoomStick: React.FC<IProps> = ({
   productBigImg,
   msgRoomId,
 }) => {
+  const _newMsgManager = useReactiveVar(newMsgManager);
+
+  const updateNewMsgAlert = () => {
+    const findOne = _newMsgManager.find((each) => each.id === msgRoomId);
+    if (findOne) {
+      return Boolean(findOne.newMsg);
+    }
+    return false;
+  };
+
   return (
     <Link
       to={`/messages/${msgRoomId}`}
@@ -35,7 +47,11 @@ export const MsgRoomStick: React.FC<IProps> = ({
       <h1 className="text-amber-300 font-semibold md:text-3xl text-lg">
         {getNameSuppressed(productName)}
       </h1>
-      <h2 className="md:text-2xl text-indigo-300 font-semibold">
+      <h2
+        className={`md:text-2xl text-indigo-300 font-semibold ${
+          updateNewMsgAlert() ? "text-amber-300" : "text-indigo-300"
+        }`}
+      >
         <FontAwesomeIcon icon={faCommentAlt} />{" "}
         <span className="text-base">{msgCounts}</span>
       </h2>

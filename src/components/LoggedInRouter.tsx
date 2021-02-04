@@ -81,10 +81,9 @@ const routes = [
 
 export const LoggedInRouter = () => {
   const { loading, error } = useMe();
-  const {
-    loading: receiveMsgCountLoading,
-    data: receiveMsgCountData,
-  } = useSubscription<receiveMsgCount>(RECEIVE_MSG_COUNT);
+  const { data: receiveMsgCountData } = useSubscription<receiveMsgCount>(
+    RECEIVE_MSG_COUNT
+  );
   const _newMsgManager = useReactiveVar(newMsgManager);
   const onClickToRestart = () => {
     const token = localStorage.getItem("token");
@@ -101,6 +100,11 @@ export const LoggedInRouter = () => {
         receiveMsgCount: { id: msgRoomId, createdAt },
       } = receiveMsgCountData;
 
+      const newData: newMsgManagerProps = {
+        id: msgRoomId,
+        newMsg: 1,
+      };
+
       if (
         window.location.href === `http://localhost:3000/messages/${msgRoomId}`
       ) {
@@ -108,11 +112,7 @@ export const LoggedInRouter = () => {
       }
 
       if (_newMsgManager.length === 0) {
-        const data: newMsgManagerProps = {
-          id: msgRoomId,
-          newMsg: 1,
-        };
-        newMsgManager([data]);
+        newMsgManager([newData]);
         return;
       }
 
@@ -136,16 +136,10 @@ export const LoggedInRouter = () => {
           return;
         }
       } else {
-        const data: newMsgManagerProps = {
-          id: msgRoomId,
-          newMsg: 1,
-        };
-        newMsgManager([...filtered, data]);
+        newMsgManager([...filtered, newData]);
       }
     }
   }, [receiveMsgCountData]);
-
-  console.log("receiveMsgCountData", receiveMsgCountData, _newMsgManager);
 
   if (loading) {
     return <LoadingSpinner />;
