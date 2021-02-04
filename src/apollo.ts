@@ -13,8 +13,8 @@ import { getMainDefinition } from "@apollo/client/utilities";
 
 export interface newMsgManagerProps {
   id: number;
-  lastSaw?: Date;
-  newMsg?: number;
+  prevMsg: number;
+  newMsg: number;
 }
 
 const token = localStorage.getItem("token");

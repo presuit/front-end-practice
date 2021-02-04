@@ -1,12 +1,11 @@
-import { gql, useQuery, useReactiveVar, useSubscription } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import { gql, useQuery, useReactiveVar } from "@apollo/client";
+import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { newMsgManager } from "../apollo";
 import { Menu } from "../components/Menu";
 import { MsgRoomStick } from "../components/MsgRoomStick";
 import { useMe } from "../hooks/useMe";
 import { allMsgRooms } from "../__generated__/allMsgRooms";
-import { receiveMsgCount } from "../__generated__/receiveMsgCount";
 
 export const ALL_MSG_ROOMS_QUERY = gql`
   query allMsgRooms {
@@ -25,21 +24,6 @@ export const ALL_MSG_ROOMS_QUERY = gql`
     }
   }
 `;
-
-export const RECEIVE_MSG_COUNT = gql`
-  subscription receiveMsgCount {
-    receiveMsgCount {
-      id
-      msgCounts
-      createdAt
-    }
-  }
-`;
-
-interface IStateProps {
-  id: number;
-  msgCounts: number;
-}
 
 export const Messages = () => {
   const history = useHistory();
@@ -64,6 +48,8 @@ export const Messages = () => {
   useEffect(() => {
     refetch();
   }, []);
+
+  console.log(_newMsgManager);
 
   return (
     <div>

@@ -15,7 +15,6 @@ import { FullSizeImgBoard } from "../components/FullSizeImgBoard";
 import { BackButton } from "../components/BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
-import { isTryStatement } from "typescript";
 
 interface IParams {
   id: string;
@@ -62,7 +61,7 @@ export const Product = () => {
   const questionRef = useRef<HTMLDivElement>(null);
   const [fullSizeMode, setFullSizeMode] = useState<boolean>(false);
   const { id } = useParams<IParams>();
-  const { data: userData, loading: userLoading } = useMe();
+  const { data: userData, loading: userLoading, refetch: refetchMe } = useMe();
   const { loading, data, refetch } = useQuery<
     findProductById,
     findProductByIdVariables
@@ -84,6 +83,7 @@ export const Product = () => {
         );
       }
       refetch({ productId: +id });
+      refetchMe();
     }
     if (!ok && error) {
       alert(error);
@@ -200,7 +200,7 @@ export const Product = () => {
   return (
     <div>
       {/* 뒤로 가기 버튼 */}
-      <BackButton />
+      <BackButton url={"/"} />
       {data?.findProductById.product?.detailImgs &&
         data?.findProductById.product?.detailImgs.length !== 0 && (
           <FullSizeImgBoard

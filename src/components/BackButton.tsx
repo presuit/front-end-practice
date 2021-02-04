@@ -10,10 +10,9 @@ export const BackButton: React.FC<IProps> = ({ url }) => {
   const history = useHistory();
   const onClickToGoBack = () => {
     if (url) {
-      console.log(url);
       return history.push(url);
     }
-    return history.push("/");
+    return history.goBack();
   };
   return (
     <div className="fixed top-0 left-0  ml-3 mt-5 z-50">

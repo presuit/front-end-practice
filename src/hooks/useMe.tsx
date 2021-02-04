@@ -13,6 +13,9 @@ const ME_QUERY = gql`
         email
         username
         avatarImg
+        msgRooms {
+          id
+        }
       }
     }
   }

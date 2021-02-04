@@ -19,10 +19,19 @@ import { CreateProduct } from "../pages/CreateProduct";
 import { EditProfile } from "../pages/EditProfile";
 import { EditProduct } from "../pages/EditProduct";
 import { MsgRoom } from "../pages/MsgRoom";
-import { useReactiveVar, useSubscription } from "@apollo/client";
-import { RECEIVE_MSG_COUNT } from "../pages/Messages";
+import { gql, useReactiveVar, useSubscription } from "@apollo/client";
 import { receiveMsgCount } from "../__generated__/receiveMsgCount";
-import { newMsgManager, newMsgManagerProps } from "../apollo";
+import { newMsgManager } from "../apollo";
+
+export const RECEIVE_MSG_COUNT = gql`
+  subscription receiveMsgCount {
+    receiveMsgCount {
+      id
+      msgCounts
+      createdAt
+    }
+  }
+`;
 
 const routes = [
   {
@@ -80,7 +89,7 @@ const routes = [
 ];
 
 export const LoggedInRouter = () => {
-  const { loading, error } = useMe();
+  const { loading, error, data: userData, refetch: refetchMe } = useMe();
   const { data: receiveMsgCountData } = useSubscription<receiveMsgCount>(
     RECEIVE_MSG_COUNT
   );
@@ -95,15 +104,13 @@ export const LoggedInRouter = () => {
   };
 
   useEffect(() => {
+    (() => {
+      return refetchMe();
+    })();
     if (receiveMsgCountData?.receiveMsgCount) {
       const {
-        receiveMsgCount: { id: msgRoomId, createdAt },
+        receiveMsgCount: { msgCounts, id: msgRoomId },
       } = receiveMsgCountData;
-
-      const newData: newMsgManagerProps = {
-        id: msgRoomId,
-        newMsg: 1,
-      };
 
       if (
         window.location.href === `http://localhost:3000/messages/${msgRoomId}`
@@ -111,32 +118,27 @@ export const LoggedInRouter = () => {
         return;
       }
 
-      if (_newMsgManager.length === 0) {
-        newMsgManager([newData]);
-        return;
+      if (userData?.me.user?.msgRooms) {
+        const msgRoomAuth = userData.me.user.msgRooms.find(
+          (each) => each.id === msgRoomId
+        );
+        if (!msgRoomAuth) {
+          return;
+        }
       }
 
       const findOne = _newMsgManager.find((each) => each.id === msgRoomId);
-      const filtered = _newMsgManager.filter((each) => each.id !== msgRoomId);
-
       if (findOne) {
-        if (findOne?.lastSaw) {
-          if (findOne.lastSaw.getTime() < new Date(createdAt).getTime()) {
-            newMsgManager([
-              ...filtered,
-              { ...findOne, newMsg: findOne?.newMsg ? findOne.newMsg + 1 : 1 },
-            ]);
-            return;
-          }
-        } else {
-          newMsgManager([
-            ...filtered,
-            { ...findOne, newMsg: findOne?.newMsg ? findOne.newMsg + 1 : 1 },
-          ]);
-          return;
-        }
+        const filtered = _newMsgManager.filter((each) => each.id !== msgRoomId);
+        newMsgManager([
+          ...filtered,
+          { ...findOne, newMsg: msgCounts - findOne.prevMsg },
+        ]);
       } else {
-        newMsgManager([...filtered, newData]);
+        newMsgManager([
+          ..._newMsgManager,
+          { id: msgRoomId, prevMsg: msgCounts - 1, newMsg: 1 },
+        ]);
       }
     }
   }, [receiveMsgCountData]);
@@ -167,6 +169,13 @@ export const LoggedInRouter = () => {
       </>
     );
   }
+
+  console.log(
+    "receiveMsgCountData",
+    receiveMsgCountData?.receiveMsgCount,
+    "userDAta",
+    userData?.me.user?.msgRooms
+  );
 
   return (
     <Router>

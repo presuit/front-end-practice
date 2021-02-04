@@ -23,7 +23,7 @@ export const MsgRoomStick: React.FC<IProps> = ({
   const updateNewMsgAlert = () => {
     const findOne = _newMsgManager.find((each) => each.id === msgRoomId);
     if (findOne) {
-      return Boolean(findOne.newMsg);
+      return findOne.newMsg !== 0;
     }
     return false;
   };

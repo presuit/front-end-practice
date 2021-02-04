@@ -299,7 +299,7 @@ export const ImgGrid: React.FC<IProps> = ({
             >
               <div
                 onClick={onClickToFullSize}
-                className="py-32 bg-cover bg-center transform hover:scale-125 transition-transform duration-500 cursor-pointer"
+                className="w-full h-full bg-cover bg-center transform hover:scale-125 transition-transform duration-500 cursor-pointer"
                 style={{ backgroundImage: `url(${eachImg})` }}
               ></div>
               {imgGridMode === ImgGridMode.delete && (

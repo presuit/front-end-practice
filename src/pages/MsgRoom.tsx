@@ -137,22 +137,27 @@ export const MsgRoom = () => {
       },
     });
     window.scrollTo(0, document.body.scrollHeight);
+
+    if (window.location.href !== `http://localhost:3000/messages/${id}`) {
+      return;
+    }
+    // newMsgManager reactiveVar update
+    const findOne = _newMsgManager.find((each) => each.id === +id);
+    const prevMsg = msgRoomData?.findMsgRoomById?.msgRoom?.msgs
+      ? msgRoomData.findMsgRoomById.msgRoom.msgs.length
+      : 0;
+    if (findOne) {
+      const filtered = _newMsgManager.filter((each) => each.id !== +id);
+      newMsgManager([...filtered, { id: +id, prevMsg, newMsg: 0 }]);
+    } else {
+      newMsgManager([..._newMsgManager, { id: +id, prevMsg, newMsg: 0 }]);
+    }
   }, [msgRoomData]);
 
   useEffect(() => {
     (() => {
       return refetchMsgRoom({ input: { id: +id } });
     })();
-    const findOne = _newMsgManager.find((each) => each.id === +id);
-    const filtered = _newMsgManager.filter((each) => each.id !== +id);
-    if (findOne) {
-      newMsgManager([
-        ...filtered,
-        { ...findOne, lastSaw: new Date(), newMsg: 0 },
-      ]);
-    } else {
-      newMsgManager([...filtered, { id: +id, lastSaw: new Date(), newMsg: 0 }]);
-    }
   }, []);
 
   console.log(msgRoomData?.findMsgRoomById.msgRoom?.msgs);
