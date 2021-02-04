@@ -61,7 +61,7 @@ export const Product = () => {
   const questionRef = useRef<HTMLDivElement>(null);
   const [fullSizeMode, setFullSizeMode] = useState<boolean>(false);
   const { id } = useParams<IParams>();
-  const { data: userData, loading: userLoading, refetch: refetchMe } = useMe();
+  const { data: userData, loading: userLoading } = useMe();
   const { loading, data, refetch } = useQuery<
     findProductById,
     findProductByIdVariables
@@ -83,7 +83,6 @@ export const Product = () => {
         );
       }
       refetch({ productId: +id });
-      refetchMe();
     }
     if (!ok && error) {
       alert(error);
