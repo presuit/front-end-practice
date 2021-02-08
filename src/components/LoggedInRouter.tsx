@@ -107,6 +107,7 @@ export const LoggedInRouter = () => {
     (() => {
       return refetchMe();
     })();
+
     if (receiveMsgCountData?.receiveMsgCount) {
       const {
         receiveMsgCount: { msgCounts, id: msgRoomId },

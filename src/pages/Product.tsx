@@ -15,6 +15,7 @@ import { FullSizeImgBoard } from "../components/FullSizeImgBoard";
 import { BackButton } from "../components/BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
+import { ALL_MSG_ROOMS_QUERY } from "./Messages";
 
 interface IParams {
   id: string;
@@ -61,7 +62,11 @@ export const Product = () => {
   const questionRef = useRef<HTMLDivElement>(null);
   const [fullSizeMode, setFullSizeMode] = useState<boolean>(false);
   const { id } = useParams<IParams>();
-  const { data: userData, loading: userLoading } = useMe();
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: refetchUser,
+  } = useMe();
   const { loading, data, refetch } = useQuery<
     findProductById,
     findProductByIdVariables
@@ -83,6 +88,7 @@ export const Product = () => {
         );
       }
       refetch({ productId: +id });
+      refetchUser();
     }
     if (!ok && error) {
       alert(error);
@@ -133,6 +139,11 @@ export const Product = () => {
             userId: userData.me.user?.id,
           },
         },
+        refetchQueries: [
+          {
+            query: ALL_MSG_ROOMS_QUERY,
+          },
+        ],
       });
     }
   };

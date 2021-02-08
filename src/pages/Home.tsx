@@ -7,7 +7,6 @@ import {
   allProducts,
   allProductsVariables,
 } from "../__generated__/allProducts";
-import { PRODUCTS_FRAGMENT } from "../fragment";
 import { Menu } from "../components/Menu";
 import { currentHomePage } from "../apollo";
 
@@ -19,12 +18,14 @@ const ALL_PRODUCTS_QUERY = gql`
       totalResults
       totalPages
       products {
-        ...productsParts
+        id
+        name
+        price
+        bigImg
+        savedAmount
       }
     }
   }
-
-  ${PRODUCTS_FRAGMENT}
 `;
 
 export const Home = () => {
