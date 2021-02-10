@@ -25,10 +25,12 @@ export const currentMeMenu = makeVar(MeMenus.UsernameMenu);
 export const currentUserProfileMenu = makeVar(UserProfileMenus.UsernameMenu);
 export const newMsgManager = makeVar<newMsgManagerProps[]>([]);
 
-const httpLink = createHttpLink({ uri: "http://localhost:4000/graphql" });
+const httpLink = createHttpLink({
+  uri: "https://random-product-backend.herokuapp.com/graphql",
+});
 
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:4000/graphql`,
+  uri: `ws://random-product-backend.herokuapp.com/graphql`,
   options: {
     reconnect: true,
     connectionParams: {
