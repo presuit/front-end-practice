@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.6",
-    "@ckeditor/ckeditor5-react": "^3.0.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.14",
@@ -17,7 +16,6 @@
     "@types/react-dom": "^16.9.10",
     "autoprefixer": "^10.2.1",
     "axios": "^0.21.1",
-    "ckeditor5-custom-build": "file:ckeditor5",
     "got": "^11.8.1",
     "graphql": "^15.4.0",
     "postcss": "^8.2.4",
@@ -34,8 +32,8 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "npm run apollo:codegen & npm run react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run apollo:codegen & npm run tailwind:build & npm run react-scripts start",
+    "build": "CI=false react-scripts build",
     "prebuild": "npm run tailwind:prod",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
