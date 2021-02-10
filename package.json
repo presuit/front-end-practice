@@ -39,7 +39,8 @@
     "prebuild": "npm run tailwind:build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "tailwind:build": "tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
+    "tailwind:prod": "cross-env NODE_ENV=production tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
+    "tailwind:build": "cross-env NODE_ENV=development tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
     "apollo:codegen": "rimraf src/__generated__ && apollo client:codegen src/__generated__ --target=typescript --outputFlat"
   },
   "eslintConfig": {
@@ -61,6 +62,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.7"
+    "@types/react-router-dom": "^5.1.7",
+    "cross-env": "^7.0.3"
   }
 }
