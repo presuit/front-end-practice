@@ -30,7 +30,7 @@ const httpLink = createHttpLink({
 });
 
 const wsLink = new WebSocketLink({
-  uri: `ws://random-product-backend.herokuapp.com/graphql`,
+  uri: `wss://random-product-backend.herokuapp.com/graphql`,
   options: {
     reconnect: true,
     connectionParams: {
