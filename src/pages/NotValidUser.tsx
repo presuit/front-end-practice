@@ -1,10 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import { request } from "http";
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useMe } from "../hooks/useMe";
-import { ConfirmVerificationCodeInput } from "../__generated__/globalTypes";
 import {
   requestNewVerification,
   requestNewVerificationVariables,

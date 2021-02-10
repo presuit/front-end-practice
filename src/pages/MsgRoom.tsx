@@ -138,7 +138,10 @@ export const MsgRoom = () => {
     });
     window.scrollTo(0, document.body.scrollHeight);
 
-    if (window.location.href !== `http://localhost:3000/messages/${id}`) {
+    if (
+      window.location.href !==
+      `https://random-product-backend.herokuapp.com/messages/${id}`
+    ) {
       return;
     }
     // newMsgManager reactiveVar update

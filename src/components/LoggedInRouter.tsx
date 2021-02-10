@@ -115,7 +115,8 @@ export const LoggedInRouter = () => {
       } = receiveMsgCountData;
 
       if (
-        window.location.href === `http://localhost:3000/messages/${msgRoomId}`
+        window.location.href ===
+        `https://random-product-backend.herokuapp.com/messages/${msgRoomId}`
       ) {
         return;
       }

@@ -87,7 +87,7 @@ export const EditProfile = () => {
           data: axiosData,
         }: { data: { deleted: boolean; error?: string } } = await axios({
           method: "DELETE",
-          url: "http://localhost:4000/uploads",
+          url: "https://random-product-backend.herokuapp.com/uploads",
           data,
         });
         if (!axiosData.deleted) {
@@ -104,7 +104,7 @@ export const EditProfile = () => {
         data,
       }: { data: { uploaded: boolean; url: string }[] } = await axios({
         method: "POST",
-        url: "http://localhost:4000/uploads",
+        url: "https://random-product-backend.herokuapp.com/uploads",
         headers: { "Content-Type": "multipart/form-data" },
         data: formImgData,
       });

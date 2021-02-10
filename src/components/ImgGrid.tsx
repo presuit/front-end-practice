@@ -82,7 +82,7 @@ export const ImgGrid: React.FC<IProps> = ({
       data: axiosData,
     }: { data: { deleted: boolean; error?: string } } = await axios({
       method: "DELETE",
-      url: "http://localhost:4000/uploads",
+      url: "https://random-product-backend.herokuapp.com/uploads",
       data,
     });
 
@@ -140,7 +140,7 @@ export const ImgGrid: React.FC<IProps> = ({
             data: { uploaded: boolean; url: string | null }[];
           } = await axios({
             method: "POST",
-            url: "http://localhost:4000/uploads",
+            url: "https://random-product-backend.herokuapp.com/uploads",
             headers: { "Content-Type": "multipart/form-data" },
             data: formData,
           });
