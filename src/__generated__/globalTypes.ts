@@ -46,6 +46,10 @@ export interface CreateProductInput {
   description?: string | null;
 }
 
+export interface DeleteProductInput {
+  productId: number;
+}
+
 export interface EditProductInput {
   name?: string | null;
   description?: string | null;
@@ -60,6 +64,10 @@ export interface EditProfileInput {
   username?: string | null;
   avatarImg?: string | null;
   userId: number;
+}
+
+export interface FindCategoryBySlugInput {
+  slug: string;
 }
 
 export interface FindMsgRoomByIdInput {
@@ -79,6 +87,10 @@ export interface JoinRoomInput {
 export interface LogInInput {
   email: string;
   password: string;
+}
+
+export interface RequestNewVerificationInput {
+  userId: number;
 }
 
 //==============================================================

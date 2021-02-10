@@ -188,7 +188,7 @@ export const Me = () => {
             <main className="p-5">
               {selected === MeMenus.UsernameMenu && (
                 <>
-                  <div className="flex flex-col items-center md:grid md:grid-cols-2 md:grid-rows-1 w-full shadow-xl">
+                  <div className="flex flex-col items-center lg:grid lg:grid-cols-2 lg:grid-rows-1 w-full shadow-xl">
                     {data.me.user.avatarImg ? (
                       <div className="w-full h-60 md:h-96  overflow-hidden">
                         <div
@@ -201,7 +201,7 @@ export const Me = () => {
                       </div>
                     ) : (
                       <div className="w-full bg-indigo-800 ">
-                        <div className="w-full py-20 md:py-32 flex items-center justify-center bg-indigo-800">
+                        <div className="w-full py-20 lg:py-32 flex items-center justify-center bg-indigo-800">
                           <FontAwesomeIcon
                             icon={faUserTimes}
                             className="md:text-9xl text-6xl text-indigo-500"
@@ -209,43 +209,47 @@ export const Me = () => {
                         </div>
                       </div>
                     )}
-                    <article className="w-full h-full grid grid-cols-3 grid-rows-1 bg-indigo-500 ">
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative ">
-                        <span className="z-10 text-gray-200">
+                    <article className=" w-full h-40 lg:h-full grid grid-cols-3 grid-rows-1 bg-indigo-500  ">
+                      <section className=" w-full h-full   font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600  flex justify-center items-center relative  ">
+                        <span className="z-10 text-gray-200 max-w-full break-words px-5 lg:text-xl">
                           {data.me.user.email}
                         </span>
                         <FontAwesomeIcon
                           icon={faAt}
-                          className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          className="lg:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
                       </section>
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
+                      <section className=" w-full h-full   font-semibold text-indigo-800  border-r-2 border-dotted border-indigo-600 flex justify-center items-center relative">
                         <span className="z-10 text-black">
                           {data.me.user.isVerified ? (
-                            <span className="text-gray-200">인증 됨</span>
+                            <span className="text-gray-200 max-w-full break-words px-5 lg:text-xl">
+                              인증 됨
+                            </span>
                           ) : (
-                            <span className="text-gray-200">인증되지 않음</span>
+                            <span className="text-gray-200 max-w-full break-words px-5 lg:text-xl">
+                              인증되지 않음
+                            </span>
                           )}
                         </span>
                         {data.me.user.isVerified ? (
                           <FontAwesomeIcon
                             icon={faCheck}
-                            className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                            className=" lg:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                           />
                         ) : (
                           <FontAwesomeIcon
                             icon={faTimes}
-                            className=" md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                            className=" lg:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                           />
                         )}
                       </section>
-                      <section className="py-10 md:px-5 w-full h-full md:text-base lg:text-xl 2xl:text-2xl  font-semibold text-indigo-800 flex justify-center items-center relative">
-                        <span className="z-10 text-gray-200">
+                      <section className=" w-full h-full   font-semibold text-indigo-800 flex justify-center items-center relative">
+                        <span className="z-10 text-gray-200 max-w-full break-words px-5 lg:text-xl">
                           {data.me.user.username}
                         </span>
                         <FontAwesomeIcon
                           icon={faUserCircle}
-                          className="md:text-9xl text-6xl absolute mx-auto text-center opacity-40"
+                          className="lg:text-9xl text-6xl absolute mx-auto text-center opacity-40"
                         />
                       </section>
                     </article>

@@ -1,65 +1,94 @@
-import React from "react";
+import { gql, useMutation } from "@apollo/client";
+import { request } from "http";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
-import { isLoggedIn } from "../apollo";
+import { useMe } from "../hooks/useMe";
 import { ConfirmVerificationCodeInput } from "../__generated__/globalTypes";
+import {
+  requestNewVerification,
+  requestNewVerificationVariables,
+} from "../__generated__/requestNewVerification";
+
+const REQUEST_NEW_VERIFICATION_MUTATION = gql`
+  mutation requestNewVerification($input: RequestNewVerificationInput!) {
+    requestNewVerification(input: $input) {
+      ok
+      error
+    }
+  }
+`;
 
 export const NotValidUser = () => {
   const history = useHistory();
-  const {
-    register,
-    getValues,
-    handleSubmit,
-    errors,
-  } = useForm<ConfirmVerificationCodeInput>({ mode: "onChange" });
-  const onClickValidation = () => {
-    const { code } = getValues();
-    history.push(`/validate-code?code=${code}`);
+  const { data, error } = useMe();
+
+  const onCompleted = (data: requestNewVerification) => {
+    const {
+      requestNewVerification: { ok },
+    } = data;
+    if (ok === true) {
+      alert(
+        "성공적으로 인증 코드가 발급 되었습니다. 이메일에 접근하여 인증을 마쳐주세요."
+      );
+    }
   };
+
+  const [requestNewVerification] = useMutation<
+    requestNewVerification,
+    requestNewVerificationVariables
+  >(REQUEST_NEW_VERIFICATION_MUTATION, {
+    onCompleted,
+  });
+
+  const onClickToRequestNewVerification = () => {
+    if (data?.me.user?.id) {
+      requestNewVerification({
+        variables: { input: { userId: data?.me.user.id } },
+      });
+    } else {
+      alert("유저 정보에 에러가 발생하였습니다. 다시 로그인 해주세요.");
+      onClickToResetToken();
+    }
+  };
+
   const onClickToResetToken = () => {
     localStorage.removeItem("token");
     history.push("/");
     window.location.reload();
   };
+
+  useEffect(() => {
+    if (data?.me.user?.isVerified && data?.me.user?.isVerified === true) {
+      history.push("/");
+      window.location.reload();
+    }
+  }, [data]);
+
   return (
     <div>
       <div className="min-h-screen flex justify-center items-center bg-indigo-500">
         <div className="max-w-screen-sm w-full mx-10 bg-white shadow-xl rounded-md py-12 px-10 sm:mx-0">
-          <h1 className="text-center font-semibold text-2xl">
-            받으신 코드를 입력하고, 서비스를 계속 이용해주세요.
-          </h1>
-          <form
-            onSubmit={handleSubmit(onClickValidation)}
-            className="w-full mt-5 flex flex-col items-end"
-          >
-            <input
-              ref={register({
-                required: "코드를 입력해 주세요",
-              })}
-              className="w-full py-5 px-3 border focus:outline-none focus:border-indigo-600 transition-colors"
-              type="text"
-              name="code"
-              placeholder="코드"
-              required
-            />
-            {errors.code?.message && (
-              <h2 className="text-red-500 font-medium text-md my-3">
-                {errors.code?.message}
-              </h2>
-            )}
-            <div className="mt-10 grid grid-cols-2 w-full">
-              <Link
-                onClick={onClickToResetToken}
-                className=" text-base hover:bg-indigo-500  hover:text-white  border transition-colors flex justify-center items-center p-3"
-                to="/"
-              >
-                로그인 페이지로 돌아가기
-              </Link>
-              <button className=" border  font-medium text-md hover:bg-teal-600 hover:text-white transition-colors flex justify-center items-center p-3 focus:outline-none">
-                확인
-              </button>
-            </div>
-          </form>
+          <div className="text-center font-semibold text-2xl">
+            <h1>입력하신 이메일로 인증 링크를 보냈습니다.</h1>
+            <h2 className="text-base mt-3">
+              메일을 체크하고 링크를 클릭하여 인증을 마쳐주세요!
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 w-full mt-10 bg-gray-200  border ">
+            <button
+              onClick={onClickToResetToken}
+              className="py-5 hover:bg-indigo-500 transition-colors  focus:outline-none "
+            >
+              이전 페이지로 돌아가기
+            </button>
+            <button
+              onClick={onClickToRequestNewVerification}
+              className="py-5 hover:bg-indigo-500 transition-colors focus:outline-none"
+            >
+              메일 다시 보내기
+            </button>
+          </div>
         </div>
       </div>
     </div>

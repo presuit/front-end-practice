@@ -22,6 +22,7 @@ import { MsgRoom } from "../pages/MsgRoom";
 import { gql, useReactiveVar, useSubscription } from "@apollo/client";
 import { receiveMsgCount } from "../__generated__/receiveMsgCount";
 import { newMsgManager } from "../apollo";
+import { Category } from "../pages/Category";
 
 export const RECEIVE_MSG_COUNT = gql`
   subscription receiveMsgCount {
@@ -71,7 +72,7 @@ const routes = [
   },
   {
     path: "/category/:slug",
-    component: Home,
+    component: Category,
   },
   {
     path: "/product/new",

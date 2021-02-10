@@ -16,6 +16,11 @@ import { BackButton } from "../components/BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { ALL_MSG_ROOMS_QUERY } from "./Messages";
+import "../styles/productDetailImg.css";
+import {
+  deleteProduct,
+  deleteProductVariables,
+} from "../__generated__/deleteProduct";
 
 interface IParams {
   id: string;
@@ -46,6 +51,15 @@ export const FIND_PRODUCT_BY_ID_QUERY = gql`
   ${PRODUCTS_FRAGMENT}
 `;
 
+const DELETE_PRODUCT_MUTATION = gql`
+  mutation deleteProduct($input: DeleteProductInput!) {
+    deleteProduct(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
 const JOIN_ROOM_MUTATION = gql`
   mutation joinRoom($input: JoinRoomInput!) {
     joinRoom(input: $input) {
@@ -74,6 +88,25 @@ export const Product = () => {
     variables: {
       productId: +id,
     },
+  });
+
+  const onCompletedDeleteProduct = (data: deleteProduct) => {
+    const {
+      deleteProduct: { ok, error },
+    } = data;
+    if (ok) {
+      alert("삭제 성공!");
+      history.push("/");
+    } else {
+      alert(error);
+    }
+  };
+
+  const [deleteProductMutation] = useMutation<
+    deleteProduct,
+    deleteProductVariables
+  >(DELETE_PRODUCT_MUTATION, {
+    onCompleted: onCompletedDeleteProduct,
   });
 
   const onCompleted = (data: joinRoom) => {
@@ -174,6 +207,13 @@ export const Product = () => {
     }
   };
 
+  const onClickToDeleteProduct = async () => {
+    const ok = window.confirm("정말로 지우시겠습니까?");
+    if (ok) {
+      await deleteProductMutation({ variables: { input: { productId: +id } } });
+    }
+  };
+
   useEffect(() => {
     if (!userLoading && userData?.me.user?.isVerified === false) {
       history.push("/not-valid-user");
@@ -206,7 +246,6 @@ export const Product = () => {
     );
   }
 
-  console.log(data);
   return (
     <div>
       {/* 뒤로 가기 버튼 */}
@@ -224,10 +263,10 @@ export const Product = () => {
         {/* 프로덕트 페이지  최상단에 위치한 상품 사진 및 정보 컴포넌트 */}
         <div className=" grid grid-rows-2  md:grid-cols-2 md:grid-rows-1  pt-10 mx-5  shadow-xl ">
           {/* 프로덕트 사진 */}
-          <div className=" w-full h-full md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-8 border-indigo-900 overflow-hidden  ">
+          <div className=" w-full h-full  md:rounded-l-2xl md:rounded-t-none rounded-t-2xl border-8 border-indigo-900 overflow-hidden  ">
             <div
               onClick={onClickFullSizeImg}
-              className="w-full h-full bg-cover bg-center transform hover:scale-110 transition-transform cursor-pointer z-0"
+              className="w-full h-full bg-cover bg-center transform hover:scale-110 transition-transform cursor-pointer z-0 twoXLImg"
               style={{
                 backgroundImage: `url(${data?.findProductById.product?.bigImg})`,
                 transitionDuration: "0.6s",
@@ -290,9 +329,16 @@ export const Product = () => {
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center border-r border-indigo-500 p-3 border-b">
               <span>🛒</span>
-              <Link to={`/category/slug`} className="hover:underline">
-                {data?.findProductById.product?.category.slug}
-              </Link>
+              {data?.findProductById.product?.category.slug ? (
+                <Link
+                  to={`/category/${data?.findProductById.product?.category.slug}`}
+                  className="hover:underline"
+                >
+                  {data?.findProductById.product?.category.slug}
+                </Link>
+              ) : (
+                <div>No Category</div>
+              )}
             </h1>
             <h1 className="text-xl font-semibold md:text-3xl  flex flex-col justify-center items-center p-3 border-b border-indigo-500">
               <span>👨‍👧‍👧</span>
@@ -335,7 +381,13 @@ export const Product = () => {
           userData?.me.user?.id &&
           data?.findProductById.product?.seller.id ===
             userData?.me.user?.id && (
-            <div className="mt-5 flex justify-end items-center mx-5">
+            <div className="mt-5 flex md:justify-end justify-center items-center mx-5">
+              <button
+                onClick={onClickToDeleteProduct}
+                className="bg-rose-600 text-gray-200 py-5 px-10 rounded-xl font-semibold md:text-xl mr-5 focus:outline-none"
+              >
+                삭제하기
+              </button>
               <Link
                 to={`/product/${id}/edit`}
                 className="bg-indigo-600 text-gray-200 py-5 px-10 rounded-xl font-semibold md:text-xl "

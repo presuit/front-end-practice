@@ -21,6 +21,7 @@ import { numberWithCommas } from "../utils";
 import { FormButton } from "../components/FormButton";
 import { BackButton } from "../components/BackButton";
 import { ImgGrid } from "../components/ImgGrid";
+import "../styles/productDetailImg.css";
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -238,20 +239,9 @@ export const CreateProduct = () => {
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex">
-            {previewImage && previewImage.length !== 0 && (
-              <div
-                onClick={onClickPreviewImageLeft}
-                className="px-3 md:px-5 cursor-pointer  flex items-center justify-center bg-indigo-900 "
-              >
-                <FontAwesomeIcon
-                  icon={faArrowLeft}
-                  className="text-2xl md:text-4xl text-indigo-300  "
-                />
-              </div>
-            )}
             <div
               onClick={onClickToSetImgGrid}
-              className=" h-64 md:h-96 bg-indigo-800 w-full flex justify-center items-center cursor-pointer"
+              className=" h-64 md:h-96 bg-indigo-800 w-full flex justify-center items-center cursor-pointer twoXLImg"
             >
               {previewImage && previewImage.length === 0 && (
                 <FontAwesomeIcon
