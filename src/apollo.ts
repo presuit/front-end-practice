@@ -10,6 +10,12 @@ import { MeMenus } from "./pages/Me";
 import { UserProfileMenus } from "./pages/UserProfile";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_BACKEND_WS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+  BASE_LOCAL_BACKEND_WS_URL,
+} from "./constants";
 
 export interface newMsgManagerProps {
   id: number;
@@ -26,11 +32,17 @@ export const currentUserProfileMenu = makeVar(UserProfileMenus.UsernameMenu);
 export const newMsgManager = makeVar<newMsgManagerProps[]>([]);
 
 const httpLink = createHttpLink({
-  uri: "https://random-product-backend.herokuapp.com/graphql",
+  uri:
+    process.env.NODE_ENV === "production"
+      ? BASE_BACKEND_HTTPS_URL
+      : BASE_LOCAL_BACKEND_HTTP_URL,
 });
 
 const wsLink = new WebSocketLink({
-  uri: `wss://random-product-backend.herokuapp.com/graphql`,
+  uri:
+    process.env.NODE_ENV === "production"
+      ? BASE_BACKEND_WS_URL
+      : BASE_LOCAL_BACKEND_WS_URL,
   options: {
     reconnect: true,
     connectionParams: {

@@ -22,6 +22,10 @@ import { FormButton } from "../components/FormButton";
 import { BackButton } from "../components/BackButton";
 import { ImgGrid } from "../components/ImgGrid";
 import "../styles/productDetailImg.css";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+} from "../constants";
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation createProduct($input: CreateProductInput!) {
@@ -149,7 +153,10 @@ export const CreateProduct = () => {
         data,
       }: { data: { uploaded: boolean; url: string }[] } = await axios({
         method: "POST",
-        url: "https://random-product-backend.herokuapp.com/uploads",
+        url:
+          process.env.NODE_ENV === "production"
+            ? `${BASE_BACKEND_HTTPS_URL}/uploads`
+            : `${BASE_LOCAL_BACKEND_HTTP_URL}/uploads`,
         headers: { "Content-Type": "multipart/form-data" },
         data: formImgData,
       });

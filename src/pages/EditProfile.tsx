@@ -7,7 +7,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router-dom";
 import { BackButton } from "../components/BackButton";
-import { BUCKET_NAME } from "../constants";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+  BUCKET_NAME,
+} from "../constants";
 import { useMe } from "../hooks/useMe";
 import {
   editProfile,
@@ -87,7 +91,10 @@ export const EditProfile = () => {
           data: axiosData,
         }: { data: { deleted: boolean; error?: string } } = await axios({
           method: "DELETE",
-          url: "https://random-product-backend.herokuapp.com/uploads",
+          url:
+            process.env.NODE_ENV === "production"
+              ? `${BASE_BACKEND_HTTPS_URL}/uploads`
+              : `${BASE_LOCAL_BACKEND_HTTP_URL}/uploads`,
           data,
         });
         if (!axiosData.deleted) {
@@ -104,7 +111,10 @@ export const EditProfile = () => {
         data,
       }: { data: { uploaded: boolean; url: string }[] } = await axios({
         method: "POST",
-        url: "https://random-product-backend.herokuapp.com/uploads",
+        url:
+          process.env.NODE_ENV === "production"
+            ? `${BASE_BACKEND_HTTPS_URL}/uploads`
+            : `${BASE_LOCAL_BACKEND_HTTP_URL}/uploads`,
         headers: { "Content-Type": "multipart/form-data" },
         data: formImgData,
       });

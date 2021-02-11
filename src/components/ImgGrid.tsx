@@ -8,7 +8,11 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { BUCKET_NAME } from "../constants";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+  BUCKET_NAME,
+} from "../constants";
 import { EDIT_PRODUCT_MUTATION } from "../pages/EditProduct";
 import {
   editProduct,
@@ -82,7 +86,10 @@ export const ImgGrid: React.FC<IProps> = ({
       data: axiosData,
     }: { data: { deleted: boolean; error?: string } } = await axios({
       method: "DELETE",
-      url: "https://random-product-backend.herokuapp.com/uploads",
+      url:
+        process.env.NODE_ENV === "production"
+          ? `${BASE_BACKEND_HTTPS_URL}/uploads`
+          : `${BASE_LOCAL_BACKEND_HTTP_URL}/uploads`,
       data,
     });
 
@@ -140,7 +147,10 @@ export const ImgGrid: React.FC<IProps> = ({
             data: { uploaded: boolean; url: string | null }[];
           } = await axios({
             method: "POST",
-            url: "https://random-product-backend.herokuapp.com/uploads",
+            url:
+              process.env.NODE_ENV === "production"
+                ? `${BASE_BACKEND_HTTPS_URL}/uploads`
+                : `${BASE_LOCAL_BACKEND_HTTP_URL}/uploads`,
             headers: { "Content-Type": "multipart/form-data" },
             data: formData,
           });

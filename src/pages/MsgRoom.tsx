@@ -7,6 +7,10 @@ import { useParams } from "react-router-dom";
 import { newMsgManager } from "../apollo";
 import { BackButton } from "../components/BackButton";
 import { MsgBlock } from "../components/msgBlock";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+} from "../constants";
 import { MSG_ROOM_FRAGMENT } from "../fragment";
 import { useMe } from "../hooks/useMe";
 import { createMsg, createMsgVariables } from "../__generated__/createMsg";
@@ -139,8 +143,8 @@ export const MsgRoom = () => {
     window.scrollTo(0, document.body.scrollHeight);
 
     if (
-      window.location.href !==
-      `https://random-product-backend.herokuapp.com/messages/${id}`
+      window.location.href !== `${BASE_BACKEND_HTTPS_URL}/messages/${id}` ||
+      `${BASE_LOCAL_BACKEND_HTTP_URL}/messages/${id}`
     ) {
       return;
     }

@@ -23,6 +23,10 @@ import { gql, useReactiveVar, useSubscription } from "@apollo/client";
 import { receiveMsgCount } from "../__generated__/receiveMsgCount";
 import { newMsgManager } from "../apollo";
 import { Category } from "../pages/Category";
+import {
+  BASE_BACKEND_HTTPS_URL,
+  BASE_LOCAL_BACKEND_HTTP_URL,
+} from "../constants";
 
 export const RECEIVE_MSG_COUNT = gql`
   subscription receiveMsgCount {
@@ -116,7 +120,8 @@ export const LoggedInRouter = () => {
 
       if (
         window.location.href ===
-        `https://random-product-backend.herokuapp.com/messages/${msgRoomId}`
+          `${BASE_BACKEND_HTTPS_URL}/messages/${msgRoomId}` ||
+        `${BASE_LOCAL_BACKEND_HTTP_URL}/messages/${msgRoomId}`
       ) {
         return;
       }
