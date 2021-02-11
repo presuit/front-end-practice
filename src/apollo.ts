@@ -34,15 +34,15 @@ export const newMsgManager = makeVar<newMsgManagerProps[]>([]);
 const httpLink = createHttpLink({
   uri:
     process.env.NODE_ENV === "production"
-      ? BASE_BACKEND_HTTPS_URL
-      : BASE_LOCAL_BACKEND_HTTP_URL,
+      ? `${BASE_BACKEND_HTTPS_URL}/graphql`
+      : `${BASE_LOCAL_BACKEND_HTTP_URL}/graphql`,
 });
 
 const wsLink = new WebSocketLink({
   uri:
     process.env.NODE_ENV === "production"
-      ? BASE_BACKEND_WS_URL
-      : BASE_LOCAL_BACKEND_WS_URL,
+      ? `${BASE_BACKEND_WS_URL}/graphql`
+      : `${BASE_LOCAL_BACKEND_WS_URL}/graphql`,
   options: {
     reconnect: true,
     connectionParams: {
